@@ -17,7 +17,7 @@ Key Features:
 
 Tech Stack:
 
-    Framework: React.js / Next.js (update based on actual tech)
+    Framework: React.js 
 
     Styling: Tailwind CSS / SCSS / Material UI
 
