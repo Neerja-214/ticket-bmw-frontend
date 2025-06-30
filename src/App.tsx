@@ -16,6 +16,7 @@ import { useToaster } from "./components/reusable/ToasterContext";
 const LzIndiaHeatMapValue = React.lazy(() => import('./app/Reports/IndiaHeatMapValues'));
 
 const LzNrjLgn = React.lazy(() => import("./login/NrjLogin"));
+const LzRegistration = React.lazy(() => import("./registration/NrjRegistration"));
 const LzAllStateReport = React.lazy(() => import("./app/AnnualRpt/AllStateReport"));
 
 const LzChangePasswordHcf = React.lazy(() => import("./app/login/ChangePasswodHcf"));
@@ -244,6 +245,13 @@ function App() {
             
           }
         ></Route>
+
+         <Route
+          path="/register"
+          element={<LzRegistration />}
+        />
+
+
         <Route
           path="/forgotPassword"
           element={
