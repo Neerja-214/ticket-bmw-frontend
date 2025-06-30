@@ -1,0 +1,37 @@
+
+.marquee-container {
+  width: 100%; /* Full width of the container */
+  overflow: hidden; /* Hide text outside the bounds */
+  white-space: nowrap; /* Prevent text from wrapping */
+}
+
+.marquee {
+  display: inline-block;
+  white-space: nowrap; /* Prevent wrapping */
+  animation: scroll 30s linear infinite; /* Scroll continuously */
+}
+
+.marquee-content {
+  display: inline-block;
+}
+.marquee.paused {
+  animation-play-state: paused; /* Pause on hover */
+}
+
+@keyframes scroll {
+  from {
+    transform: translateX(30%); /* Start slightly inside the container for immediate scroll */
+  }
+  to {
+    transform: translateX(-100%); /* Scroll fully to the left */
+  }
+}
+
+
+
+.circleimg {
+  width: 500px; /* Adjust width as needed */
+  height: 500px; /* Adjust height as needed */
+  background-size: cover;
+  background-position: center;
+}

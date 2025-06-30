@@ -1,0 +1,249 @@
+body {
+    margin: 0;
+    font-family: "Figtree", -apple-system, BlinkMacSystemFont, "Segoe UI", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    height: 100vh;
+    background: white;
+    font-size: 24px;
+    overflow: hidden; /* Prevent body from scrolling */
+    display: flex;
+    flex-direction: column;
+}
+
+.app {
+    background: whitesmoke;
+    display: flex;
+    flex: 1;
+    overflow: hidden; /* Prevent main content from scrolling */
+}
+
+.sidebar-container {
+    width: 250px;
+    background-color: #f8f9fa;
+    overflow-y: auto;
+    flex-shrink: 0;
+    position: fixed; /* Keep sidebar fixed */
+    height: 100vh;
+    transition: all 0.3s ease-in-out;
+    z-index: 1000; /* Ensure sidebar stays on top */
+}
+
+.menu-item {
+    position: relative;
+    margin-bottom: 10px;
+    padding: 10px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.menu-item .active-menu-item {
+    background-color: #e5e5e5;
+    color: #165a72;
+    font-weight: bold;
+}
+
+.default-menu-item-text {
+    width: 250px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 14px;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.full-menu-item-text {
+    position: absolute;
+    top: 70%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 5px;
+    z-index: 1000;
+    white-space: nowrap;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease-in-out, width 0.3s ease-in-out;
+    font-size: 14px;
+    text-align: center;
+    transition: opacity 0.3s ease;
+    z-index: 100;
+}
+
+.menu-item:hover .default-menu-item-text {
+    opacity: 1;
+}
+
+.menu-item:hover .full-menu-item-text {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Main Content Styling */
+.main-content {
+    margin-left: 250px; /* Adjust for the sidebar width */
+    padding: 20px;
+    background: #f0f0f0;
+    flex: 1;
+    overflow-y: auto;
+    transition: margin-left 0.3s ease-in-out;
+}
+
+@media (max-width: 1300px) {
+    .sidebar-container {
+        width: 190px; /* Keep sidebar width reduced for smaller screens */
+        overflow-x: visible; /* Ensure content like arrows is visible */
+    }
+    .css-1wvake5 {
+        width: 206px  !important;
+        min-width : 206px  !important;
+    }
+    .css-x3jz15 {
+        width: 96% !important;
+        position: relative;
+    }
+    .main-content {
+        margin-left: 185px; /* Match the sidebar width */
+    }
+    .default-menu-item-text {
+        width: calc(100% - 30px); /* Adjust width to prevent text and arrows from overlapping */
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-size: 14px;
+    }
+    .menu-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between; /* Ensure arrows are visible on the right */
+        padding: 10px 15px; /* Adjust padding for better spacing */
+        width:130%
+    }
+
+    .menu-item-icon {
+        margin-left: auto; /* Push the arrow icon to the right */
+        display: inline-block;
+    }
+
+    /* Ensure nested submenu items are visible and aligned */
+    .submenu-item {
+        display: flex;
+        align-items: center;
+        padding: 5px 10px;
+        font-size: 13px;
+    }
+    .ps-submenu-expand-icon {
+        display: inline-block; /* Ensure it is visible */
+        width: 20px; /* Adjust size as needed */
+        height: 20px;
+        color: #000; /* Ensure it matches your theme */
+    }
+    
+    .ps-submenu-root:hover .ps-submenu-expand-icon {
+        color: #165a72; /* Optional hover effect */
+    }
+}
+
+/* Media Queries */
+@media (max-width: 1024px) {
+    .sidebar-container {
+        width: 170px; /* Reduce sidebar width for smaller screens */
+    }
+    .css-1wvake5 {
+        width: 170px  !important;
+        min-width : 170px  !important;
+    }
+
+    .main-content {
+        margin-left: 200px; /* Match the sidebar width */
+    }
+    .default-menu-item-text {
+        display: block; /* Ensure it's treated as a block element */
+        width: 130% !important;
+        overflow: hidden; /* Hide overflow */
+        text-overflow: ellipsis; /* Add ellipsis for overflowing text */
+        white-space: nowrap; /* Prevent text wrapping */
+        font-size: 14px;
+        box-sizing: border-box; /* Include padding and border in width calculation */
+    }
+}
+
+@media (max-width: 768px) {
+    .sidebar-container {
+        width: 100%; /* Sidebar becomes full-width */
+        height: auto;
+        position: relative; /* No overlap on small screens */
+    }
+
+    .default-menu-item-text {
+        display: block; /* Ensure it's treated as a block element */
+        width: 79% !important;
+        overflow: hidden; /* Hide overflow */
+        text-overflow: ellipsis; /* Add ellipsis for overflowing text */
+        white-space: nowrap; /* Prevent text wrapping */
+        font-size: 14px;
+        box-sizing: border-box; /* Include padding and border in width calculation */
+    }
+     .menu-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between; /* Ensure arrows are visible on the right */
+        width: 169% !important;
+       
+    }
+
+    .main-content {
+        margin-left: 0; /* Remove margin for full-width sidebar */
+    }
+
+    .css-1wvake5 {
+        width: 150px !important;
+        min-width: 150px !important;
+    }
+
+    /* Ensure nested menus have sufficient width */
+    .nested-menu .default-menu-item-text {
+        width: 50% !important; /* Apply same width to nested menu items */
+    }
+}
+
+
+@media (max-width: 480px) {
+    .sidebar-container {
+        width: 100%; /* Compact sidebar width for mobile */
+        height: 100%; /* Full-height sidebar */
+        overflow-x: hidden; /* Prevent horizontal scrolling */
+        display: flex;
+        flex-direction: column; /* Stack items vertically */
+        align-items: center;
+    }
+
+    .css-1wvake5 {
+        width: 50px !important; /* Match the sidebar width */
+        min-width: 50px !important; /* Enforce minimum width */
+    }
+
+    .menu-item {
+        flex: none; /* Prevent stretching of menu items */
+        width: 100%; /* Take full sidebar width */
+        text-align: center; /* Center-align items */
+        display: flex;
+        flex-direction: column; /* Stack icon and text */
+        align-items: center;
+    }
+
+    .default-menu-item-text {
+        display: block; /* Ensure text is visible */
+        font-size: 10px; /* Smaller font size for mobile */
+        margin-top: 4px; /* Add space between icon and text */
+        text-align: center; /* Center-align text under icons */
+        width:50%
+    }
+
+    .main-content {
+        margin-left: 0; /* Ensure main content is full width */
+    }
+}

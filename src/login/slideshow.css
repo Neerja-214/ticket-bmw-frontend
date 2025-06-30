@@ -1,0 +1,14 @@
+/* slideshow.css */
+
+/* Reduce size of the arrows */
+.awesome-slider .awssld-arrow {
+    width: 30px; /* Adjust width as needed */
+    height: 30px; /* Adjust height as needed */
+  }
+  
+  /* Optionally, adjust arrow positioning */
+  .awesome-slider .awssld-arrow:before,
+  .awesome-slider .awssld-arrow:after {
+    font-size: 24px; /* Adjust the arrow icon size if using font icons */
+  }
+  

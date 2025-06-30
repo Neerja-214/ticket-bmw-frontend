@@ -1,0 +1,151 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins');
+*
+{
+    font-family: 'Poppins', sans-serif;
+}
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+.bxDash {
+  height:100px !important
+}
+.swal2-container {
+  z-index: 9999 !important; /* Higher than Material UI components */
+  margin-top: 60px !important; /* Push toast below AppBar */
+}
+
+/* 
+.swal2-popup.swal-toast-error,
+.swal2-popup.swal-toast-success,
+.swal2-popup.swal-toast-warning {
+  color: #fff; 
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 8px;
+  padding: 12px 20px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+
+.swal-toast-error {
+  background-color: #d32f2f !important; 
+  border-left: 6px solid #ff3d00 !important; 
+  box-shadow: 0px 4px 15px rgba(255, 0, 0, 0.4);
+}
+
+
+.swal-toast-success {
+  background-color: #2e7d32 !important; 
+  border-left: 6px solid #00c853 !important; 
+  box-shadow: 0px 4px 15px rgba(0, 255, 0, 0.4);
+}
+
+
+.swal-toast-warning {
+  background-color: #ed6c02 !important; 
+  border-left: 6px solid #ff9800 !important; 
+  box-shadow: 0px 4px 15px rgba(255, 165, 0, 0.4);
+}
+.ag-row.highlighted-row {
+  background-color: #d0e7ff !important;
+  border: 1px solid #4a90e2 !important; 
+  box-shadow: 0 0 5px rgba(0, 0, 255, 0.3); 
+} */
+.swal-toast-success {
+  background: linear-gradient(135deg, #d4edda, #a8e6a2) !important;
+  color: #155724 !important;
+  border-left: 5px solid #28a745 !important;
+  border-radius: 10px !important;
+  box-shadow: 0px 4px 10px rgba(40, 167, 69, 0.4) !important;
+}
+
+.swal-toast-error {
+  background: linear-gradient(135deg, #f8d7da, #f4a5ab) !important;
+  color: #721c24 !important;
+  border-left: 5px solid #dc3545 !important;
+  border-radius: 10px !important;
+  box-shadow: 0px 4px 10px rgba(220, 53, 69, 0.4) !important;
+}
+
+.swal-toast-warning {
+  background: linear-gradient(135deg, #fff3cd, #ffe8a1) !important;
+  color: #856404 !important;
+  border-left: 5px solid #ffc107 !important;
+  border-radius: 10px !important;
+  box-shadow: 0px 4px 10px rgba(255, 193, 7, 0.4) !important;
+}
+
+.swal-toast-show {
+  animation: fadeIn 0.5s ease-in-out, slideIn 0.5s ease-in-out;
+}
+
+.swal-toast-hide {
+  animation: fadeOut 0.5s ease-in-out, slideOut 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.9); }
+}
+
+@keyframes slideIn {
+  from { transform: translateY(-20px); }
+  to { transform: translateY(0); }
+}
+
+@keyframes slideOut {
+  from { transform: translateY(0); }
+  to { transform: translateY(-20px); }
+}
+
+/* .highlighted-row {
+  background-color: rgb(169, 228, 252) !important;
+}
+
+.ag-cell.highlighted-row {
+  background-color: rgb(169, 228, 252) !important;
+  color: black !important;
+} */
+
+.highlighted-cell {
+  background-color: rgb(169, 228, 252) !important; /* Light Blue */
+  color: black !important;
+  font-weight: bold;
+}
+.mapContainer {
+  height: calc(100vh - 80px);
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  position: static;
+  color: #fff;
+  /* margin-top: 20px; */
+}
+.mapContainer > div {
+  margin: 20px 20px;
+}
+.btnCont {
+  display: flex;
+  justify-content: center;
+}

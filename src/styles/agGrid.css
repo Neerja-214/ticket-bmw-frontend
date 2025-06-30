@@ -1,0 +1,44 @@
+.ag-theme-alpine .ag-root-wrapper {
+    border: none;
+}
+
+/* .ag-header-cell-label {
+    /* Necessary to allow for text to grow vertically 
+    visible: hidden;
+    height: 0;
+    padding: 0 !important;
+} */
+
+.red-row {
+    background-color: rgba(255, 176, 176, 0.756) !important;
+    /* Set the background color for the 'red' rows */
+}
+
+.yellow-row {
+    background-color: rgba(255, 255, 137, 0.756) !important;
+    /* Set the background color for the 'yellow' rows */
+}
+
+.blue-row {
+    background-color: rgba(103, 146, 255, 0.756) !important;
+    /* Set the background color for the 'blue' rows */
+}
+
+.green-row {
+    background-color: rgba(166, 252, 166, 0.756) !important;
+    /* Set the background color for the 'blue' rows */
+}
+
+.orange-row {
+    background-color: rgba(255, 204, 110, 0.756) !important;
+    /* Set the background color for the 'blue' rows */
+}
+
+.all-row {
+    font-weight : bold !important;
+    /* Set the background color for the 'blue' rows */
+}
+
+
+
+

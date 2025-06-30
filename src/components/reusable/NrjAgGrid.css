@@ -1,0 +1,53 @@
+.ag-theme-alpine {
+    /*--ag-foreground-color: rgb(126, 46, 132); */
+    /*--ag-header-foreground-color: rgb(22,117,224); */
+    /* --ag-header-background-color: rgb(22,117,224); */
+     --ag-header-background-color: #31adff;
+    /* linear-gradient(right,    #9ece84,    #c5dc71,  #9ece84 0%,  #c5dc71 100% ); */
+    --ag-odd-row-background-color: rgb(0, 0, 0, 0.03);
+    /* --ag-header-column-resize-handle-color: rgb(126, 46, 132); */
+    --ag-header-height: 50px;
+    --ag-font-size: 12px;
+    --ag-font-family: monospace;
+    --ag-header-column-separator-color: grey;
+}
+.red-row {
+    background-color: rgba(255, 239, 239, 0.9) !important;
+    /* Set the background color for the 'red' rows */
+  }
+  
+  .yellow-row {
+    background-color: rgba(255, 255, 230, 0.9) !important;
+    /* Set the background color for the 'yellow' rows */
+  }
+  
+  .blue-row {
+    background-color: rgba(238, 243, 255, 0.9) !important;
+    /* Set the background color for the 'blue' rows */
+  }
+  
+  .green-row {
+    background-color: rgba(238, 255, 238, 0.9) !important;
+    /* Set the background color for the 'blue' rows */
+  }
+  
+  .cyt-row {
+    background-color: rgba(253, 240, 217, 0.9) !important;
+    /* Set the background color for the 'blue' rows */
+  }
+  
+  .white-row {
+    background-color: rgba(252, 252, 252, 0.9) !important;
+    /* Set the background color for the 'blue' rows */
+  }
+  
+  .all-row {
+    background-color: rgba(199, 199, 199, 0.9) !important;
+    /* Set the background color for the 'blue' rows */
+  }
+
+  .over {
+    transform: scale(1.01);
+    border: 1px dashed #eee;
+  }
+

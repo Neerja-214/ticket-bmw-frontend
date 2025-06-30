@@ -1,0 +1,207 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.buttonShadowWhite {
+  border-radius: 4px;
+  color: #000;
+  background: var(--pure-white, #FFF);
+  box-shadow: 0px 0px 0px 1px rgba(70, 79, 96, 0.16), 0px 1px 1px 0px rgba(0, 0, 0, 0.10);
+}
+
+.buttonShadowBlue {
+  color: #fff;
+  border-radius: 4px;
+  background: var(--brand-primary, #0F6CBD);
+  box-shadow: 0px 0px 0px 1px #5E5ADB, 0px 1px 1px 0px rgba(0, 0, 0, 0.10);
+}
+
+.datamap-state{
+  fill: rgb(251, 249, 182)
+}
+
+
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+/* td, th {
+  
+
+} */
+.backGrey:nth-child(even) {
+  background-color: #dddddd;
+}
+.tableHdr{
+  padding: 6px !important;
+  /* border: 1px solid #dddddd; */
+
+  text-align: left;
+}
+.tableHdr1{
+  padding: 8px !important;
+  background-color: #fff;
+  height: 60px;
+  /* border: 1px solid #dddddd; */
+
+  text-align: left;
+}
+
+.equal-row{
+  height: 60px;
+  border-bottom: dashed 1px rgb(197, 196, 196);
+}
+
+.equal-rowone{
+  height: 120px;
+  border-bottom: dashed 1px rgb(197, 196, 196);
+}.equal-rowtwo{
+  height: 180px;
+  border-bottom: dashed 1px rgb(197, 196, 196);
+}
+.custom-header-class {
+  writing-mode: vertical-rl; /* vertical right-to-left */
+  transform: rotate(180deg);
+}
+
+
+ /* add this css for state Ar heading invert */
+/* .state-header {
+  padding: 10px;
+}
+
+.text-14 {
+  font-size: 14px;
+} */
+
+/* .mt-2 {
+  margin-top: 8px; 
+} */
+
+/* .inverted {
+  background-color: rgb(153, 149, 149); 
+  color: white; 
+  display: inline-block; 
+  padding: 5px; 
+  border-radius: 5px;
+} */
+
+ /* .ag-header, .ag-pivot-off, .ag-header-allow-overflow{
+  height: 217px !important;
+  min-height: 101px;
+} */
+
+.table-container {
+  overflow-x: hidden; /* Disables horizontal scrolling */
+  max-width: 100%; /* Ensures the table fits within the container */
+}
+
+.table {
+  width: 100%; /* Full width of container */
+  border-collapse: collapse; /* Ensures borders don't double up */
+  table-layout: auto; /* Let the table layout adjust based on content */
+}
+
+
+.backGrey {
+  background-color: #f0f0f0;
+}
+
+.tableHdr {
+  font-weight: bold;
+}
+
+.border {
+  border: 1px solid #ccc;
+}
+
+.equal-row,
+.equal-rowone,
+.equal-rowtwo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Align items to the start to avoid overlap */
+}
+
+.equal-row {
+  /* Align items to the start to avoid overlap */
+  
+ overflow-y: hidden;
+}
+
+.wrap-text {
+  max-width: 200px; /* Adjust width as needed */
+  word-wrap: break-word; /* Break long words */
+  white-space: normal; /* Wrap text */
+}
+
+.flex {
+  display: flex;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.equal-row > div,
+.equal-rowone > div,
+.equal-rowtwo > div {
+  padding: 4px;
+}
+
+.chart-container {
+  position: relative;
+}
+
+.chart-container text[text-anchor="middle"] {
+  transform: translateX(50%); /* Centers the title */
+}
+.mapContainer {
+  height: 500px; /* or any height you'd like */
+  width: 100%;
+}
+.mapContainer > div {
+  margin: 20px 20px;
+}
+.btnCont {
+  display: flex;
+  justify-content: center;
+}

@@ -1,0 +1,41 @@
+.boxrd {
+    width:200px;
+    height:200px;
+    border: 3px solid #ccc;
+    border-radius:10px;
+    line-height:200px;
+    text-align:center;
+    color :#ddd;
+    font-size:25px;
+    font-weight:600;
+    text-transform:uppercase;
+    position:relative;
+    overflow:hidden;
+}
+
+    .boxrd:before {
+        content: "";
+        position: absolute;
+        width: 400px;
+        height: 400px;
+        background: red;
+        left: 50%;
+        transform: translateX(-50%);
+        border-radius: 40%;
+        animation: fillrd 9s ease-in-out infinite;
+        z-index: 100;
+        /**/
+    }
+
+@keyframes fillrd {
+    from {
+        top :250px;
+        transform:translateX(-50%) rotate(0deg)
+
+    }
+
+    to {
+        top: var(--filltopr);
+        transform: translateX(-50%) rotate(360deg)
+    }
+}

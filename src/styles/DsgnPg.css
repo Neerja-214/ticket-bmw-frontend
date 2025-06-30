@@ -1,0 +1,83 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins');
+*
+{
+    font-family: 'Poppins', sans-serif;
+}
+body
+{
+    background: #ececec !important;
+}
+.topBar
+{
+    background: white;
+    padding:10px 0;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+}
+.topBar img
+{
+    height:80px;
+}
+.topBar h2{
+    display:inline-block;
+    font-size:30px;
+
+}
+.NavHeader
+{
+    background: linear-gradient(#000042, #0d00ba);
+    padding:15px 0;
+    color:white
+}
+.form-title{
+    font-weight: bold;
+    margin: 20px 0 20px 0;
+    font-size: 30px;
+}
+.label1
+{
+  color: #f30009;
+    font-size: 12px;
+    display: block;
+    margin: 10px 0;
+}
+.card
+{
+    background: white;
+}
+.card .card-header
+{
+    background: linear-gradient(#000042, #0d00ba);
+    color: white;
+    font-size: 13px;
+    padding:8px 20px;
+    font-weight: 500;
+}
+
+.rs-picker-toggle {
+    top :-2px!important
+}
+.card .card-body
+{
+    background: white;
+}
+.card .card-body  label
+{
+    font-size: 12px;
+    color: black;
+}
+.astrict
+{
+    color: red;
+    padding: 5px;
+}
+.controls
+{
+    margin: 0 0 15px 0;
+}
+
+.rs-navbar-inverse{
+    background: linear-gradient(#000042, #0d00ba)!important;
+}

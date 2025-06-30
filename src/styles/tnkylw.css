@@ -1,0 +1,137 @@
+/* body {
+    margin : 0px;
+    height : 100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:"Open Sans", sans-serif;
+    background:#222;
+
+
+} */
+
+.box {
+    width:200px;
+    height:200px;
+    border: 3px solid #ccc;
+    border-radius:10px;
+    line-height:200px;
+    text-align:center;
+    color :#ddd;
+    font-size:25px;
+    font-weight:600;
+    text-transform:uppercase;
+    position:relative;
+    overflow:hidden;
+}
+
+    .box:before {
+        content: "";
+        position: absolute;
+        width: 400px;
+        height: 400px;
+        background: yellow;
+        left: 50%;
+        transform: translateX(-50%);
+        border-radius: 40%;
+        animation: fill 17s ease-in-out infinite;
+        z-index: 100;
+        /**/
+    }
+
+@keyframes fill {
+    from {
+        top :250px;
+        transform:translateX(-50%) rotate(0deg)
+
+    }
+
+    to {
+        top: var(--filltopy);
+        transform: translateX(-50%) rotate(360deg)
+    }
+}
+
+.boxwh {
+    width:200px;
+    height:200px;
+    border: 3px solid #ccc;
+    border-radius:10px;
+    line-height:200px;
+    text-align:center;
+    color :#000;
+    font-size:25px;
+    font-weight:600;
+    text-transform:uppercase;
+    position:relative;
+    overflow:hidden;
+}
+
+    .boxwh:before {
+        content: "";
+        position: absolute;
+        width: 400px;
+        height: 400px;
+        background: black;
+        left: 50%;
+        transform: translateX(-50%);
+        border-radius: 40%;
+        animation: fillwh 14s ease-in-out infinite;
+        z-index: 100;
+        /**/
+    }
+
+@keyframes fillwh {
+    from {
+        top :250px;
+        transform:translateX(-50%) rotate(0deg)
+
+    }
+
+    to {
+        top: var(--filltopw);
+        transform: translateX(-50%) rotate(360deg)
+    }
+}
+
+.boxcy {
+    width:200px;
+    height:200px;
+    border: 3px solid #ccc;
+    border-radius:10px;
+    line-height:200px;
+    text-align:center;
+    color :#000;
+    font-size:25px;
+    font-weight:600;
+    text-transform:uppercase;
+    position:relative;
+    overflow:hidden;
+}
+
+    .boxcy:before {
+        content: "";
+        position: absolute;
+        width: 500px;
+        height: 500px;
+        background: yellow;
+        left: 50%;
+        transform: translateX(-50%);
+        border-radius: 40%;
+        animation: fillcy 9s ease-in-out infinite;
+        z-index: 100;
+        /**/
+    }
+
+@keyframes fillcy {
+    from {
+        top :250px;
+        transform:translateX(-50%) rotate(0deg)
+
+    }
+
+    to {
+        top: var(--filltopc);
+        transform: translateX(-50%) rotate(360deg)
+    }
+}
