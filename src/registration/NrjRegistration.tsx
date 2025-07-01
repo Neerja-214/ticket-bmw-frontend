@@ -177,9 +177,10 @@ const [states, setStates] = useState<string[]>(fallbackStates); // default to fa
 </div>
 
 {/* Registration Form Section */}
-<div className="flex justify-center items-center min-h-screen pt-40 relative z-10 overflow-y-auto">
+<div className="flex justify-center items-center min-h-screen mt-10 pt-40 relative z-10 overflow-y-auto">
+  {/* border-blue-300 */}
   <div className="bg-gray-200 bg-opacity-20 backdrop-blur-sm p-8 rounded-2xl shadow-lg w-full max-w-2xl mx-4 my-8">
-    <div className="text-center mb-8">
+    <div className="text-center mb-4  mt-[200px] ">
       <h1 className="text-3xl font-bold text-white">Registration</h1>
     </div>
 
