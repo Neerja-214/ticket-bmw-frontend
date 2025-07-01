@@ -1,12 +1,13 @@
-import React, { useEffect, useReducer } from 'react';
+import React, { useEffect, useReducer, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import NrjAgGrid from '../../components/reusable/NrjAgGrid'; // Adjust path
-import { useToaster } from '../../components/reusable/ToasterContext'; // Adjust path
-import { nrjAxiosRequest } from '../../Hooks/useNrjAxios'; // Adjust path
-import { getLvl, getWho } from '../../utilities/cpcb'; // Adjust path
+import NrjAgGrid from '../../components/reusable/NrjAgGrid';
+import { useToaster } from '../../components/reusable/ToasterContext';
+import { nrjAxiosRequest } from '../../Hooks/useNrjAxios';
+import { getLvl, getWho } from '../../utilities/cpcb';
 import moment from 'moment';
-import { UseMomentDateNmb } from '../../Hooks/useMomentDtArry'; // Adjust path
-import CPCB_Logo from '../../images/CPCB_Logo.jpg'; // Adjust path
+import { UseMomentDateNmb } from '../../Hooks/useMomentDtArry';
+import CPCB_Logo from '../../images/CPCB_Logo.jpg';
+import { Modal, Button, Box, Typography, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 
 // Reducer actions
 const ACTIONS = {
@@ -59,7 +60,7 @@ const CustomButtonRenderer = (params: any) => {
       {params.buttons.map((btn: any) => (
         <button
           key={btn.colId}
-          onClick={() => params.clicked(btn.buttonText, params.data)}
+          onClick={() => params.onButtonClicked(btn.buttonText, params.data)}
           className="px-3 py-1 bg-blue-700 text-white rounded hover:bg-blue-800 text-sm"
         >
           {btn.buttonText}
@@ -69,48 +70,6 @@ const CustomButtonRenderer = (params: any) => {
   );
 };
 
-// Column definitions for the grid
-const coldef = [
-  { field: 'ticketId', headerName: 'Ticket ID', width: 150, filter: 'agTextColumnFilter', tooltipField: 'ticketId' },
-  { field: 'issueType', headerName: 'Issue Type', width: 200, filter: 'agTextColumnFilter', tooltipField: 'issueType' },
-  { field: 'generatedOn', headerName: 'Generated On', width: 180, filter: 'agTextColumnFilter', tooltipField: 'generatedOn' },
-  { field: 'reviewedOn', headerName: 'Reviewed On', width: 180, filter: 'agTextColumnFilter', tooltipField: 'reviewedOn' },
-  { field: 'reviewedBy', headerName: 'Reviewed By', width: 200, filter: 'agTextColumnFilter', tooltipField: 'reviewedBy' },
-  {
-    field: 'actions',
-    headerName: 'Actions',
-    width: 250,
-    cellRenderer: CustomButtonRenderer,
-    cellRendererParams: {
-      buttons: [
-        { buttonText: 'View Ticket', colId: 'viewTicket', showApi: 'view|ticketId|[ticketId]' },
-        { buttonText: 'Ticket Trail', colId: 'ticketTrail', showApi: 'trail|ticketId|[ticketId]' },
-      ],
-    },
-  },
-];
-
-// Excel export configuration
-const printExcelHeader = ['Ticket ID', 'Issue Type', 'Generated On', 'Reviewed On', 'Reviewed By'];
-const keyOrder = ['ticketId', 'issueType', 'generatedOn', 'reviewedOn', 'reviewedBy'];
-const excelColWidth = [
-  { wch: 20 },
-  { wch: 30 },
-  { wch: 25 },
-  { wch: 25 },
-  { wch: 30 },
-];
-
-// PDF export configuration
-const colDefPdf = [
-  { field: 'ticketId', headerName: 'Ticket ID', width: 150, filter: 'agTextColumnFilter', tooltipField: 'ticketId' },
-  { field: 'issueType', headerName: 'Issue Type', width: 200, filter: 'agTextColumnFilter', tooltipField: 'issueType' },
-  { field: 'generatedOn', headerName: 'Generated On', width: 180, filter: 'agTextColumnFilter', tooltipField: 'generatedOn' },
-  { field: 'reviewedOn', headerName: 'Reviewed On', width: 180, filter: 'agTextColumnFilter', tooltipField: 'reviewedOn' },
-  { field: 'reviewedBy', headerName: 'Reviewed By', width: 200, filter: 'agTextColumnFilter', tooltipField: 'reviewedBy' },
-];
-const pdfColWidth = ['20%', '25%', '20%', '20%', '15%'];
-
 // Dummy data for the grid
 const dummyData = [
   {
@@ -119,6 +78,14 @@ const dummyData = [
     generatedOn: '01-Jul-2025',
     reviewedOn: '02-Jul-2025',
     reviewedBy: 'John Doe',
+    complainantName: 'Alice Johnson',
+    complainantEmail: 'alice.johnson@example.com',
+    complainantPhone: '+91 9876543210',
+    closedDate: '03-Jul-2025',
+    issue: 'Application crashed during data upload.',
+    screenshots: ['screenshot1.jpg', 'screenshot2.jpg'],
+    ticketStatus: 'Closed',
+    assignedTo: 'John Doe',
   },
   {
     ticketId: 'TCK002',
@@ -126,6 +93,14 @@ const dummyData = [
     generatedOn: '01-Jul-2025',
     reviewedOn: '',
     reviewedBy: '',
+    complainantName: 'Bob Smith',
+    complainantEmail: 'bob.smith@example.com',
+    complainantPhone: '+91 9123456789',
+    closedDate: '',
+    issue: 'User unable to login with valid credentials.',
+    screenshots: ['screenshot3.jpg'],
+    ticketStatus: 'Open',
+    assignedTo: '',
   },
   {
     ticketId: 'TCK003',
@@ -133,14 +108,72 @@ const dummyData = [
     generatedOn: '30-Jun-2025',
     reviewedOn: '01-Jul-2025',
     reviewedBy: 'Jane Smith',
+    complainantName: 'Carol White',
+    complainantEmail: 'carol.white@example.com',
+    complainantPhone: '+91 9988776655',
+    closedDate: '02-Jul-2025',
+    issue: 'Incorrect data displayed in report.',
+    screenshots: ['screenshot4.jpg'],
+    ticketStatus: 'Closed',
+    assignedTo: 'Jane Smith',
   },
 ];
+
+// Mock officers list for Assign to dropdown
+const officers = ['John Doe', 'Jane Smith', 'Michael Brown', ''];
 
 const AllTickets: React.FC = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const { showToaster } = useToaster();
+  const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [assignModalOpen, setAssignModalOpen] = useState(false);
+  const [selectedTicket, setSelectedTicket] = useState<any>(null);
 
-  // Mock data fetching function
+  // Column definitions for the grid
+  const coldef = [
+    { field: 'ticketId', headerName: 'Ticket ID', width: 150, filter: 'agTextColumnFilter', tooltipField: 'ticketId' },
+    { field: 'issueType', headerName: 'Issue Type', width: 200, filter: 'agTextColumnFilter', tooltipField: 'issueType' },
+    { field: 'generatedOn', headerName: 'Generated On', width: 180, filter: 'agTextColumnFilter', tooltipField: 'generatedOn' },
+    { field: 'reviewedOn', headerName: 'Reviewed On', width: 180, filter: 'agTextColumnFilter', tooltipField: 'reviewedOn' },
+    { field: 'reviewedBy', headerName: 'Reviewed By', width: 200, filter: 'agTextColumnFilter', tooltipField: 'reviewedBy' },
+    {
+      field: 'actions',
+      headerName: 'Actions',
+      width: 400,
+      cellRenderer: CustomButtonRenderer,
+      cellRendererParams: (params: any) => ({
+        onButtonClicked: (buttonText: string, data: any) => onButtonClicked(buttonText, data),
+        buttons: [
+          { buttonText: 'View Ticket', colId: 'viewTicket', showApi: 'view|ticketId|[ticketId]' },
+          { buttonText: 'Ticket Trail', colId: 'ticketTrail', showApi: 'trail|ticketId|[ticketId]' },
+          { buttonText: 'Assign Officer', colId: 'assignOfficer', showApi: 'assign|ticketId|[ticketId]' },
+        ],
+      }),
+    },
+  ];
+
+  // Excel export configuration
+  const printExcelHeader = ['Ticket ID', 'Issue Type', 'Generated On', 'Reviewed On', 'Reviewed By'];
+  const keyOrder = ['ticketId', 'issueType', 'generatedOn', 'reviewedOn', 'reviewedBy'];
+  const excelColWidth = [
+    { wch: 20 },
+    { wch: 30 },
+    { wch: 25 },
+    { wch: 25 },
+    { wch: 30 },
+  ];
+
+  // PDF export configuration
+  const colDefPdf = [
+    { field: 'ticketId', headerName: 'Ticket ID', width: 150, filter: 'agTextColumnFilter', tooltipField: 'ticketId' },
+    { field: 'issueType', headerName: 'Issue Type', width: 200, filter: 'agTextColumnFilter', tooltipField: 'issueType' },
+    { field: 'generatedOn', headerName: 'Generated On', width: 180, filter: 'agTextColumnFilter', tooltipField: 'generatedOn' },
+    { field: 'reviewedOn', headerName: 'Reviewed On', width: 180, filter: 'agTextColumnFilter', tooltipField: 'reviewedOn' },
+    { field: 'reviewedBy', headerName: 'Reviewed By', width: 200, filter: 'agTextColumnFilter', tooltipField: 'reviewedBy' },
+  ];
+  const pdfColWidth = ['20%', '25%', '20%', '20%', '15%'];
+
+  // Mock data fetching function for grid
   const fetchTickets = async () => {
     const lvl = getLvl() || 'CPCB';
     const who = getWho();
@@ -155,7 +188,16 @@ const AllTickets: React.FC = () => {
     // return nrjAxiosRequest('getTickets', payload);
   };
 
-  // Process fetched data
+  // Mock API for fetching ticket details
+  const fetchTicketDetails = async (ticketId: string) => {
+    // Simulate API call
+    const ticket = dummyData.find((t) => t.ticketId === ticketId);
+    return ticket || {};
+    // Uncomment for actual API
+    // return nrjAxiosRequest('viewTicket', { ticketId });
+  };
+
+  // Process fetched data for grid
   const populateGrid = (data: any) => {
     let dt = data?.data || dummyData;
     if (dt && Array.isArray(dt)) {
@@ -194,16 +236,41 @@ const AllTickets: React.FC = () => {
     console.log('Selected row:', data);
   };
 
-  const onButtonClicked = (action: string, rowData: any) => {
+  const onButtonClicked = async (action: string, rowData: any) => {
     if (action === 'View Ticket') {
-      console.log('View Ticket clicked for:', rowData.ticketId);
+      const ticketDetails = await fetchTicketDetails(rowData.ticketId);
+      setSelectedTicket(ticketDetails);
+      setViewModalOpen(true);
     } else if (action === 'Ticket Trail') {
-      console.log('Ticket Trail clicked for:', rowData.ticketId);
+      // Placeholder for separate Ticket Trail component
+      console.log('Ticket Trail clicked for:', rowData.ticketId, 'To be implemented in separate component');
+    } else if (action === 'Assign Officer') {
+      const ticketDetails = await fetchTicketDetails(rowData.ticketId);
+      setSelectedTicket(ticketDetails);
+      setAssignModalOpen(true);
     }
   };
 
+  const handleCloseViewModal = () => {
+    setViewModalOpen(false);
+    setSelectedTicket(null);
+  };
+
+  const handleCloseAssignModal = () => {
+    setAssignModalOpen(false);
+    setSelectedTicket(null);
+  };
+
+  const handleUpdateAssign = () => {
+    // Placeholder for update API call
+    console.log('Update clicked for:', selectedTicket?.ticketId, 'Assigned to:', selectedTicket?.assignedTo);
+    showToaster(['Assignment updated successfully'], 'success');
+    setAssignModalOpen(false);
+    setSelectedTicket(null);
+  };
+
   return (
-    <div className="flex flex-col bg-blue-900 relative overflow-hidden min-h-screen">
+    <div className="flex flex-col bg-blue-900 relative overflow-y-auto min-h-screen">
       {/* Header */}
       <header className="flex w-full items-center justify-between px-4 py-2 gap-x-2 md:gap-x-4 bg-white z-10">
         <div className="flex items-center gap-x-2 md:gap-x-4 shrink-0">
@@ -232,7 +299,7 @@ const AllTickets: React.FC = () => {
         <div className="flex items-center gap-x-2 md:gap-x-4 shrink-0">
           <img src={CPCB_Logo} alt="CPCB Logo" className="h-10 md:h-14 lg:h-16" />
           <img
-            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSaR0MDuxr4P1nT7tcj-j7FLNCz3GyW_ioo6Q&s"
+            src="https://encrypted-tbn0.gstatic.com/images?q=tbni:ANd9GcSaR0MDuxr4P1nT7tcj-j7FLNCz3GyW_ioo6Q&s"
             alt="Logo 4"
             className="h-10 md:h-14 w-20 md:w-24"
           />
@@ -243,7 +310,7 @@ const AllTickets: React.FC = () => {
       <div className="absolute inset-0 z-0">
         <div className="absolute w-32 h-32 bg-blue-300 rounded-full opacity-30 animate-blob top-1/6 left-1/4"></div>
         <div className="absolute w-40 h-40 bg-blue-400 rounded-full opacity-30 animate-blob animation-delay-2000 top-1/8 right-1/8"></div>
-        <div className="absolute w-24 h-24 bg-blue-200 rounded-full opacity-30 animate-blob animation-delay-4000 bottom-1/4 right-0"></div>
+        <div className="absolute w-24 h-24 bg-blue-200 rounded-full opacity-30 animate-blob animation-delay-4000 bottom-1/4 right-2/4"></div>
       </div>
 
       {/* Grid Section */}
@@ -278,6 +345,144 @@ const AllTickets: React.FC = () => {
           />
         </div>
       </div>
+
+      {/* View Ticket Modal */}
+      <Modal open={viewModalOpen} onClose={handleCloseViewModal}>
+        <Box
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: { xs: '90%', sm: 500 },
+            bgcolor: 'background.paper',
+            boxShadow: 24,
+            p: 4,
+            borderRadius: 2,
+          }}
+        >
+          <Typography variant="h6" component="h2" gutterBottom>
+            Ticket ID: {selectedTicket?.ticketId || 'N/A'}
+          </Typography>
+          <Box sx={{ mt: 2 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+              <Typography variant="body1" sx={{ fontWeight: 'bold' }}>Complainant Name:</Typography>
+              <Typography variant="body1">{selectedTicket?.complainantName || 'N/A'}</Typography>
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+              <Typography variant="body1" sx={{ fontWeight: 'bold' }}>Complainant Email ID:</Typography>
+              <Typography variant="body1">{selectedTicket?.complainantEmail || 'N/A'}</Typography>
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+              <Typography variant="body1" sx={{ fontWeight: 'bold' }}>Complainant Phone:</Typography>
+              <Typography variant="body1">{selectedTicket?.complainantPhone || 'N/A'}</Typography>
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+              <Typography variant="body1" sx={{ fontWeight: 'bold' }}>Generated On:</Typography>
+              <Typography variant="body1">{selectedTicket?.generatedOn || 'N/A'}</Typography>
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+              <Typography variant="body1" sx={{ fontWeight: 'bold' }}>Closed Date:</Typography>
+              <Typography variant="body1">{selectedTicket?.closedDate || 'N/A'}</Typography>
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+              <Typography variant="body1" sx={{ fontWeight: 'bold' }}>Issue Type:</Typography>
+              <Typography variant="body1">{selectedTicket?.issueType || 'N/A'}</Typography>
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+              <Typography variant="body1" sx={{ fontWeight: 'bold' }}>Issue:</Typography>
+              <Typography variant="body1" sx={{ maxWidth: '60%' }}>{selectedTicket?.issue || 'N/A'}</Typography>
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+              <Typography variant="body1" sx={{ fontWeight: 'bold' }}>Screenshots:</Typography>
+              <Typography variant="body1">{selectedTicket?.screenshots?.join(', ') || 'No screenshots available'}</Typography>
+            </Box>
+            <Button
+              variant="contained"
+              color="primary"
+              sx={{ mt: 2 }}
+              onClick={() => console.log('View Trail clicked for:', selectedTicket?.ticketId, 'To be implemented in separate component')}
+            >
+              View Trail
+            </Button>
+          </Box>
+          <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
+            <Button onClick={handleCloseViewModal} style={{ textTransform: 'none' }}>
+              Close
+            </Button>
+          </Box>
+        </Box>
+      </Modal>
+
+      {/* Assign Officer Modal */}
+      <Modal open={assignModalOpen} onClose={handleCloseAssignModal}>
+        <Box
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: { xs: '90%', sm: 500 },
+            bgcolor: 'background.paper',
+            boxShadow: 24,
+            p: 4,
+            borderRadius: 2,
+          }}
+        >
+          <Typography variant="h6" component="h2" gutterBottom>
+            Ticket ID: {selectedTicket?.ticketId || 'N/A'}
+          </Typography>
+          <Box sx={{ mt: 2 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+              <Typography variant="body1" sx={{ fontWeight: 'bold' }}>Ticket Status:</Typography>
+              <Typography variant="body1">{selectedTicket?.ticketStatus || 'N/A'}</Typography>
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+              <Typography variant="body1" sx={{ fontWeight: 'bold' }}>Generated On:</Typography>
+              <Typography variant="body1">{selectedTicket?.generatedOn || 'N/A'}</Typography>
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+              <Typography variant="body1" sx={{ fontWeight: 'bold' }}>Issue:</Typography>
+              <Typography variant="body1" sx={{ maxWidth: '60%' }}>{selectedTicket?.issue || 'N/A'}</Typography>
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+              <Typography variant="body1" sx={{ fontWeight: 'bold' }}>Issue Type:</Typography>
+              <Typography variant="body1">{selectedTicket?.issueType || 'N/A'}</Typography>
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1, alignItems: 'center' }}>
+              <Typography variant="body1" sx={{ fontWeight: 'bold' }}>Assign to:</Typography>
+              <FormControl sx={{ minWidth: 200 }}>
+                <InputLabel id="assign-to-label">Assign to</InputLabel>
+                <Select
+                  labelId="assign-to-label"
+                  value={selectedTicket?.assignedTo || ''}
+                  label="Assign to"
+                  disabled
+                >
+                  {officers.map((officer) => (
+                    <MenuItem key={officer} value={officer}>
+                      {officer || 'Unassigned'}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Box>
+          </Box>
+          <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+            <Button onClick={handleCloseAssignModal} style={{ textTransform: 'none' }}>
+              Close
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleUpdateAssign}
+              style={{ textTransform: 'none' }}
+            >
+              Update
+            </Button>
+          </Box>
+        </Box>
+      </Modal>
 
       {/* Blob Animation Styles */}
       <style>
