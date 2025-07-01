@@ -18,6 +18,7 @@ const LzIndiaHeatMapValue = React.lazy(() => import('./app/Reports/IndiaHeatMapV
 const LzNrjLgn = React.lazy(() => import("./login/NrjLogin"));
 const LzRegistration = React.lazy(() => import("./registration/NrjRegistration"));
 const LzLodgeComplaint = React.lazy(() => import("./registration/NrjLodgeComplaint"));
+const LzAllTickets = React.lazy(() => import("./app/Tickets/AllTickets"));
 
 
 const LzAllStateReport = React.lazy(() => import("./app/AnnualRpt/AllStateReport"));
@@ -257,6 +258,11 @@ function App() {
          <Route
           path="/registerComplaint"
           element={<LzLodgeComplaint />}
+        />
+        
+         <Route
+          path="/allTickets"
+          element={<LzAllTickets />}
         />
 
 

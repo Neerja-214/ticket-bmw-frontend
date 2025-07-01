@@ -51,7 +51,6 @@ const NrjLogin = () => {
   const [captchaImage, setCaptchaImage] = useState("");
   const [uuid, setUuid] = useState("");
   const [selectedType, setSelectedType] = useState("Admin");
-  const [selectedAdminRole, setSelectedAdminRole] = useState("Admin");
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const navigate = useNavigate();
 
@@ -93,10 +92,6 @@ const NrjLogin = () => {
 
   const handleTypeChange = (event: any) => {
     setSelectedType(event.target.value);
-  };
-
-  const handleAdminRoleChange = (event: any) => {
-    setSelectedAdminRole(event.target.value);
   };
 
   const togglePassword = () => {
@@ -241,7 +236,7 @@ const NrjLogin = () => {
             <h3 className="text-lg font-medium text-white">Login</h3>
           </div>
           <div className="flex justify-center">
-            {["Admin", "User"].map((role) => (
+            {["Admin", "CBWTF", "HCF"].map((role) => (
               <div key={role} className="inline-flex items-center mr-4">
                 <input
                   type="radio"
@@ -286,27 +281,6 @@ const NrjLogin = () => {
                   {isPasswordVisible ? <FaEyeSlash /> : <FaEye />}
                 </button>
               </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-white">Admin Level</label>
-            {selectedType === "Admin" && (
-              <div className="flex justify-center">
-                {["Admin", "Help Desk", "Division Head", "Officer"].map((role) => (
-                  <div key={role} className="inline-flex items-center mr-4">
-                    <input
-                      type="radio"
-                      name="adminRole"
-                      value={role}
-                      checked={selectedAdminRole === role}
-                      onChange={handleAdminRoleChange}
-                      className="mr-2 text-white"
-                    />
-                    <label className="text-white text-xs">{role}</label>
-                  </div>
-                ))}
-              </div>
-            )}
             </div>
 
             <div>
