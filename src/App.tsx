@@ -18,6 +18,8 @@ const LzIndiaHeatMapValue = React.lazy(() => import('./app/Reports/IndiaHeatMapV
 const LzNrjLgn = React.lazy(() => import("./login/NrjLogin"));
 const LzRegistration = React.lazy(() => import("./registration/NrjRegistration"));
 const LzLodgeComplaint = React.lazy(() => import("./registration/NrjLodgeComplaint"));
+// Lazy load the Dashboard component
+const LzDashboard = React.lazy(() => import("./dashboard/NrjDashboard"));
 
 
 const LzAllStateReport = React.lazy(() => import("./app/AnnualRpt/AllStateReport"));
@@ -257,6 +259,15 @@ function App() {
          <Route
           path="/registerComplaint"
           element={<LzLodgeComplaint />}
+        />
+
+        <Route
+          path="/dashboard"
+          element={
+            <React.Suspense fallback={<div>Loading Dashboard...</div>}>
+              <LzDashboard />
+            </React.Suspense>
+          }
         />
 
 
