@@ -1,4 +1,4 @@
-import React, { useEffect, useState,startTransition  } from "react";
+import React, { useEffect, useState, startTransition } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import { Loader } from "rsuite";
 import "./App.css";
@@ -19,6 +19,8 @@ const LzNrjLgn = React.lazy(() => import("./login/NrjLogin"));
 const LzRegistration = React.lazy(() => import("./registration/NrjRegistration"));
 const LzLodgeComplaint = React.lazy(() => import("./registration/NrjLodgeComplaint"));
 const LzAllTickets = React.lazy(() => import("./app/Tickets/AllTickets"));
+// Lazy load the Dashboard component
+const LzDashboard = React.lazy(() => import("./dashboard/NrjDashboard"));
 
 
 const LzAllStateReport = React.lazy(() => import("./app/AnnualRpt/AllStateReport"));
@@ -112,7 +114,7 @@ const LzAuthorHcfRegiterIndpnt = React.lazy(() => import("./app/hcf/HcfRegisterI
 const LzAuthorHcfConsentList = React.lazy(() => import("./app/hcf/HcfConsentList"));
 const LzAuthorHcfConsentReport = React.lazy(() => import("./app/hcf/HcfConsentReport"));
 const LzHcfAnnlPrt = React.lazy(() => import("./app/hcf/HcfAnnlRpt"));
- const LzHcfAnnlPrtFormTab = React.lazy(() => import("./app/hcf/HcfAnnlRptFormTab"))
+const LzHcfAnnlPrtFormTab = React.lazy(() => import("./app/hcf/HcfAnnlRptFormTab"))
 // const LzHcfAnnlPrtFormTab = React.lazy(() => import("./app/hcf/HcfAnnlRptFormTab_copy"))
 const LzHcfAnnlPrtCpcb = React.lazy(() => import("./app/hcf/HcfAnnlRptCpcb"))
 const LzHcfMonthlyPrtCpcb = React.lazy(() => import("./app/hcf/HcfMonthlyRptCpcb"))
@@ -130,7 +132,7 @@ function App() {
   const [state, setState] = useState<string>('Active')
   const [count, setCount] = useState<number>(0)
   const [remaining, setRemaining] = useState<number>(0)
-    const { showToaster, hideToaster } = useToaster();
+  const { showToaster, hideToaster } = useToaster();
   const navigate = useNavigate();
   function signout() {
     localStorage.clear();
@@ -170,37 +172,37 @@ function App() {
   })
 
   const { data: dataC, refetch: refetchC } = useQuery({
-          queryKey: ['logout'],
-          queryFn: logoutApi,
-          enabled: false,
-          staleTime: Number.POSITIVE_INFINITY,
-          refetchOnWindowFocus: false,
-          refetchOnReconnect: false,
-          onSuccess: logoutApiSuccess,
-      })
-  
-      function logoutApi() {
-  
-          let base64Data = sessionStorage.getItem('isLoggedOut') || "";
-          let jsonData = atob(base64Data)
-          if (jsonData) {
-              let data = JSON.parse(jsonData);
-              let payload: any = postLinux('M/SSM110041DLCDG6042' + "=" + '22ffd3cb69804c3ba561aee92606f4bc', "logout");
-              return nrjAxiosRequestLinux('logout', payload)
-          } else {
-              showToaster(["Please try again !!!"], 'error');
-           
-          }
-  
-  
-      }
-  
-      function logoutApiSuccess(data: any) {
-          localStorage.clear();
-          sessionStorage.clear();
-      }
+    queryKey: ['logout'],
+    queryFn: logoutApi,
+    enabled: false,
+    staleTime: Number.POSITIVE_INFINITY,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    onSuccess: logoutApiSuccess,
+  })
 
-  
+  function logoutApi() {
+
+    let base64Data = sessionStorage.getItem('isLoggedOut') || "";
+    let jsonData = atob(base64Data)
+    if (jsonData) {
+      let data = JSON.parse(jsonData);
+      let payload: any = postLinux('M/SSM110041DLCDG6042' + "=" + '22ffd3cb69804c3ba561aee92606f4bc', "logout");
+      return nrjAxiosRequestLinux('logout', payload)
+    } else {
+      showToaster(["Please try again !!!"], 'error');
+
+    }
+
+
+  }
+
+  function logoutApiSuccess(data: any) {
+    localStorage.clear();
+    sessionStorage.clear();
+  }
+
+
   useEffect(() => {
     const handleUnload = () => {
       logoutApi();
@@ -228,102 +230,120 @@ function App() {
 
 
     <div
-    style={{
-      height: "100vh",          // Full viewport height
-      overflowY: "auto",        // Only show scrollbar if content overflows
-      display: "flex",          // Flexbox layout
-      flexDirection: "column",  // Stack child elements vertically
-      backgroundColor: "#F5F5F5", // Set background color
-      margin: 0,                // Ensure no margin causes extra space
-      padding: 0,               // Remove default padding
-    }}
-  >
-        <React.Suspense fallback={<Loader size="lg" content="Loading..." />}>
-      <Routes>
-        <Route
-          index
-          // path="/login"
-          element={
-            
+      style={{
+        height: "100vh",          // Full viewport height
+        overflowY: "auto",        // Only show scrollbar if content overflows
+        display: "flex",          // Flexbox layout
+        flexDirection: "column",  // Stack child elements vertically
+        backgroundColor: "#F5F5F5", // Set background color
+        margin: 0,                // Ensure no margin causes extra space
+        padding: 0,               // Remove default padding
+      }}
+    >
+      <React.Suspense fallback={<Loader size="lg" content="Loading..." />}>
+        <Routes>
+          <Route
+            index
+            // path="/login"
+            element={
+
               <LzNrjLgn />
-            
-          }
-        ></Route>
 
-         <Route
-          path="/register"
-          element={<LzRegistration />}
-        />
+            }
+          ></Route>
 
-         <Route
-          path="/registerComplaint"
-          element={<LzLodgeComplaint />}
-        />
-        
-         <Route
-          path="/allTickets"
-          element={<LzAllTickets />}
-        />
+          <Route
+            path="/register"
+            element={<LzRegistration />}
+          />
+
+          <Route
+            path="/registerComplaint"
+            element={<LzLodgeComplaint />}
+          />
+
+          <Route
+            path="/allTickets"
+            element={<LzAllTickets />}
+          />
+
+          <Route
+            path="/dashboard"
+            element={
+              <React.Suspense fallback={<div>Loading Dashboard...</div>}>
+                <LzDashboard />
+              </React.Suspense>
+            }
+          />
+
+          <Route
+            path="/dashboard"
+            element={
+              <React.Suspense fallback={<div>Loading Dashboard...</div>}>
+                <LzDashboard />
+              </React.Suspense>
+            }
+          />
 
 
-        <Route
-          path="/forgotPassword"
-          element={
-            
+          <Route
+            path="/forgotPassword"
+            element={
+
               <LzNrjForgotPassword />
-            
-          }
-        ></Route>
 
-        <Route
-          path="/login"
-          element={
-            
+            }
+          ></Route>
+
+          <Route
+            path="/login"
+            element={
+
               <LzNrjLgn />
-            
-          }
-        ></Route>
-        <Route
-          path="/hcfMaster"
-          element={
-            
+
+            }
+          ></Route>
+          <Route
+            path="/hcfMaster"
+            element={
+
               <LzHcfSignup></LzHcfSignup>
-            
-          }
-        ></Route>
-        <Route
-          path="/hcfAr"
-          element={
-            
+
+            }
+          ></Route>
+          <Route
+            path="/hcfAr"
+            element={
+
               <LzHcfAr></LzHcfAr>
-            
-          }
-        ></Route>
-        <Route
-          path="/hcfArDaily"
-          element={
-            
+
+            }
+          ></Route>
+          <Route
+            path="/hcfArDaily"
+            element={
+
               <LzHcfArDaily></LzHcfArDaily>
-            
-          }
-        ></Route>
-        <Route
-          path="/hcfAnnlRpt"
-          element={
-            
+
+            }
+          ></Route>
+          <Route
+            path="/hcfAnnlRpt"
+            element={
+
               <LzHcfAnnlPrt></LzHcfAnnlPrt>
-            
-          }
-        ></Route>
-        <Route
-          path="/hcfRemark"
-          element={
-            
+
+            }
+          ></Route>
+          <Route
+            path="/hcfRemark"
+            element={
+
               <LzHcfRemark></LzHcfRemark>
-            
-          }
-        ></Route>
-        {/* <Route
+
+            }
+          ></Route>
+          {/* <Route
           path="/ChangePasswordHcf"
           element={
             
@@ -333,17 +353,17 @@ function App() {
         ></Route> */}
 
 
-        <Route
-          path="/cbwtfMonthlyRpt"
-          element={
-            
+          <Route
+            path="/cbwtfMonthlyRpt"
+            element={
+
               <NrjRequire>
                 <LzCbwtfMonthlyRpt />
               </NrjRequire>
-            
-          }
-        ></Route>
-        {/* <Route
+
+            }
+          ></Route>
+          {/* <Route
           path="/cbwtfDtl"
           element={
             
@@ -353,94 +373,94 @@ function App() {
             
           }
         ></Route> */}
-        <Route
-          path="/"
-          element={
-            <SwitchLayout />
-          }>
           <Route
-            path="/mapIndia"
+            path="/"
             element={
-              
-                 <NrjRequire>
+              <SwitchLayout />
+            }>
+            <Route
+              path="/mapIndia"
+              element={
+
+                <NrjRequire>
                   <LzIndiaHeatMapValue />
                 </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/ChangePasswordHcf"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/ChangePasswordHcf"
+              element={
+
                 <LzChangePasswordHcf></LzChangePasswordHcf>
-              
-            }
-          ></Route>
-          <Route
-            path="/ChangePasswordCbwtf"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/ChangePasswordCbwtf"
+              element={
+
                 <LzChangePasswordCbwtf></LzChangePasswordCbwtf>
-              
-            }
-          ></Route>
-          <Route
-            path="/cbwtfAnnulRpt"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/cbwtfAnnulRpt"
+              element={
+
                 <NrjRequire>
                   <LzCbwtfAnnulRpt />
                 </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/hcfDetails"
-            element={
-              
-              <NrjRequire>
-              <LzHcfMaster />
-            </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/hcfAnnlRptFormTab"
-            element={
-              
-              
-              <NrjRequire>
-              <LzHcfAnnlPrtFormTab />
-            </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/cbwtfDtl"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/hcfDetails"
+              element={
+
+                <NrjRequire>
+                  <LzHcfMaster />
+                </NrjRequire>
+
+              }
+            ></Route>
+            <Route
+              path="/hcfAnnlRptFormTab"
+              element={
+
+
+                <NrjRequire>
+                  <LzHcfAnnlPrtFormTab />
+                </NrjRequire>
+
+              }
+            ></Route>
+            <Route
+              path="/cbwtfDtl"
+              element={
+
                 <NrjRequire>
                   <LzCbwtfDetails />
                 </NrjRequire>
-              
-            }
-          ></Route>
 
-          <Route
-            path="/cbwtfdspl"
-            element={
-              
+              }
+            ></Route>
+
+            <Route
+              path="/cbwtfdspl"
+              element={
+
                 <NrjRequire>
                   <LzCbwtfLstRep></LzCbwtfLstRep>
                 </NrjRequire>
-              
-            }
-          ></Route>
 
-          <Route
-            path="/hcflist"
-            element={
-              
+              }
+            ></Route>
+
+            <Route
+              path="/hcflist"
+              element={
+
                 <NrjRequire>
                   <LzListHCF
                     path={"hcflist"}
@@ -461,7 +481,7 @@ function App() {
                       {
                         field: "hcfcod",
                         width: 180,
-                         headerName: "SPCB/PCC code",
+                        headerName: "SPCB/PCC code",
                         filter: "agTextColumnFilter",
                       },
                       {
@@ -515,13 +535,13 @@ function App() {
                     ]}
                   ></LzListHCF>
                 </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/hcfbd"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/hcfbd"
+              element={
+
                 <NrjRequire>
                   <LzListHCF
                     path={"hcfbd"}
@@ -542,7 +562,7 @@ function App() {
                       {
                         field: "hcfcod",
                         width: 180,
-                         headerName: "SPCB/PCC code",
+                        headerName: "SPCB/PCC code",
                         filter: "agTextColumnFilter",
                       },
                       {
@@ -596,44 +616,44 @@ function App() {
                     ]}
                   ></LzListHCF>
                 </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/bhuvanmap"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/bhuvanmap"
+              element={
+
                 <NrjRequire>
                   <LzBhuvanMap />
                 </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/vehicletrack_map"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/vehicletrack_map"
+              element={
+
                 <NrjRequire>
                   <LzVechilceTrackingMap />
                 </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/googlemap"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/googlemap"
+              element={
+
                 <NrjRequire>
                   <LzGoogleMap />
                 </NrjRequire>
-              
-            }
-          ></Route>
 
-          <Route
-            path="/hcfnbd"
-            element={
-              
+              }
+            ></Route>
+
+            <Route
+              path="/hcfnbd"
+              element={
+
                 <NrjRequire>
                   <LzListHCF
                     path={"hcfnbd"}
@@ -654,7 +674,7 @@ function App() {
                       {
                         field: "hcfcod",
                         width: 100,
-                         headerName: "SPCB/PCC code",
+                        headerName: "SPCB/PCC code",
                         filter: "agTextColumnFilter",
                       },
                       {
@@ -707,13 +727,13 @@ function App() {
                     ]}
                   ></LzListHCF>
                 </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/hcflstgrd"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/hcflstgrd"
+              element={
+
                 <NrjRequire>
                   <LzGridDisply
                     path={"hcfregtdy"}
@@ -721,13 +741,13 @@ function App() {
 
                   ></LzGridDisply>
                 </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/hcfcbwtf"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/hcfcbwtf"
+              element={
+
                 <NrjRequire>
                   <LzHCFCnt
                     groupBy={"cbwtfid"}
@@ -737,7 +757,7 @@ function App() {
                       {
                         field: "cbwtfnm",
                         width: 250,
-                         headerName: "Name of CBWTF",
+                        headerName: "Name of CBWTF",
                         tooltipField: "tphcf",
                         filter: "agTextColumnFilter",
                       },
@@ -752,11 +772,11 @@ function App() {
                         width: 130,
                         headerName: "City",
                       },
-                      
+
                       {
                         field: "rgd",
                         width: 180,
-                       headerName: "Regional directorate"
+                        headerName: "Regional directorate"
                       },
                       {
                         field: "hcfcount",
@@ -781,7 +801,7 @@ function App() {
                         headerName: "Non bedded HCF",
                         tooltipField: "tpnobd",
                       },
-                    
+
                       {
                         field: "tphcf",
                         width: 150,
@@ -803,14 +823,14 @@ function App() {
                     ]}
                   ></LzHCFCnt>
                 </NrjRequire>
-              
-            }
-          ></Route>
-          {/* can use this page to show details */}
-          <Route
-            path="/hcfrgd"
-            element={
-              
+
+              }
+            ></Route>
+            {/* can use this page to show details */}
+            <Route
+              path="/hcfrgd"
+              element={
+
                 <NrjRequire>
                   <LzHCFCnt
                     groupBy={"rgd"}
@@ -825,7 +845,7 @@ function App() {
                       {
                         field: "_id",
                         width: 400,
-                       headerName: "Regional directorate"
+                        headerName: "Regional directorate"
                       },
                       {
                         field: "bedded",
@@ -850,659 +870,659 @@ function App() {
                     ]}
                   ></LzHCFCnt>
                 </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/ListWrngHCFCode"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/ListWrngHCFCode"
+              element={
+
                 <LzWrongWstBgCbwtf />
-              
-            }
-          ></Route>
-          <Route
-            path="/wstbgs"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/wstbgs"
+              element={
+
                 <NrjRequire>
                   <LzListCbwtfWstData />
                 </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/cntr"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/cntr"
+              element={
+
                 <NrjRequire>
                   <LzCpcbHo />
                 </NrjRequire>
-              
-            }
-          ></Route>
 
-          <Route
-            path="/changePwd"
-            element={
-              
+              }
+            ></Route>
+
+            <Route
+              path="/changePwd"
+              element={
+
                 <LzChangePassword />
-              
-            }
-          ></Route>
 
-          <Route
-            path="/cityHcfSearch"
-            element={
-              
+              }
+            ></Route>
+
+            <Route
+              path="/cityHcfSearch"
+              element={
+
                 <NrjRequire>
                   <LzCityHcfList />
                 </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/rgnd"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/rgnd"
+              element={
+
                 <NrjRequire>
                   <LzRgDrct />
                 </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/rgndlst"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/rgndlst"
+              element={
+
                 <NrjRequire>
                   <LzRgnDirtLst />
                 </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/sttdlst"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/sttdlst"
+              element={
+
                 <NrjRequire>
                   <LzSttDircctrLst />
                 </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/stt"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/stt"
+              element={
+
                 <NrjRequire>
                   <LzStateBrd />
                 </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/hcfNonVisited"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/hcfNonVisited"
+              element={
+
                 <NrjRequire>
                   <LzHcfNonVisited></LzHcfNonVisited>
                 </NrjRequire>
-              
-            }
-          ></Route>
 
-          <Route
-            path="/bagCntPrHr"
-            element={
-              
+              }
+            ></Route>
+
+            <Route
+              path="/bagCntPrHr"
+              element={
+
                 <NrjRequire>
                   <LzBagCntPrHr></LzBagCntPrHr>
                 </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/bagCntPrGrid"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/bagCntPrGrid"
+              element={
+
                 <NrjRequire>
                   <LzBagCntPrHrGrid></LzBagCntPrHrGrid>
                 </NrjRequire>
-              
-            }
-          ></Route>
 
-          <Route
-            path="/bigBag"
-            element={
-              
+              }
+            ></Route>
+
+            <Route
+              path="/bigBag"
+              element={
+
                 <NrjRequire>
                   <LzBigBag></LzBigBag>
                 </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/bagcntwthLbl"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/bagcntwthLbl"
+              element={
+
                 <NrjRequire>
                   <LzMisBagcount></LzMisBagcount>
                 </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/bagcntwthGeo"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/bagcntwthGeo"
+              element={
+
                 <NrjRequire>
                   <LzMisBagcntwthGeo></LzMisBagcntwthGeo>
                 </NrjRequire>
-              
-            }
-          ></Route>
-           <Route
-            path="/bagcntwthincrt"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/bagcntwthincrt"
+              element={
+
                 <NrjRequire>
                   <LzMisBagcntwthIncrt></LzMisBagcntwthIncrt>
                 </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/serialNumber"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/serialNumber"
+              element={
+
                 <NrjRequire>
                   <LzSerialNumber></LzSerialNumber>
                 </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/displayDataCard"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/displayDataCard"
+              element={
+
                 <NrjRequire>
                   <LzDisplayDataCard></LzDisplayDataCard>
                 </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/HcfCrtList"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/HcfCrtList"
+              element={
+
                 <NrjRequire>
                   <LzHcfCorrectedList></LzHcfCorrectedList>
                 </NrjRequire>
-              
-            }
-          ></Route>
+
+              }
+            ></Route>
 
 
-          <Route
-            path="/HcfBlckusr"
-            element={
-              
+            <Route
+              path="/HcfBlckusr"
+              element={
+
                 <NrjRequire>
                   <LzHcfUnblockUser></LzHcfUnblockUser>
                 </NrjRequire>
-              
-            }
-          ></Route>
 
-          <Route
-            path="/bagWtCntChrt2"
-            element={
-              
+              }
+            ></Route>
+
+            <Route
+              path="/bagWtCntChrt2"
+              element={
+
                 <NrjRequire>
                   <LzBagWeightChartScnBy></LzBagWeightChartScnBy>
                 </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/bagWtCntChrt3"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/bagWtCntChrt3"
+              element={
+
                 <NrjRequire>
                   <LzBagWeightChartScnBy50></LzBagWeightChartScnBy50>
                 </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/bagWtCntChrt4"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/bagWtCntChrt4"
+              element={
+
                 <NrjRequire>
                   <LzBagWeightChart30></LzBagWeightChart30>
                 </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/bagWtCntChrt5"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/bagWtCntChrt5"
+              element={
+
                 <NrjRequire>
                   <LzBagWeightChart50></LzBagWeightChart50>
                 </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/bagWtCntChrt6"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/bagWtCntChrt6"
+              element={
+
                 <NrjRequire>
                   <LzBagWeightChart3050></LzBagWeightChart3050>
                 </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/bagWtCntChrt7"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/bagWtCntChrt7"
+              element={
+
                 <NrjRequire>
                   <LzBagWeightChart3050Abv></LzBagWeightChart3050Abv>
                 </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/bagWtCntChrt8"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/bagWtCntChrt8"
+              element={
+
                 <NrjRequire>
                   <LzBagWeightChartScnBy3050></LzBagWeightChartScnBy3050>
                 </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/bagWtCntChrt9"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/bagWtCntChrt9"
+              element={
+
                 <NrjRequire>
                   <LzBagWeightChartScnBy3050Abv></LzBagWeightChartScnBy3050Abv>
                 </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/bagWtCntChrt10"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/bagWtCntChrt10"
+              element={
+
                 <NrjRequire>
                   <LzBagWeightChartDate></LzBagWeightChartDate>
                 </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/bagCbwtfScnBy"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/bagCbwtfScnBy"
+              element={
+
                 <NrjRequire>
                   <LzBagCbwtfScnBy></LzBagCbwtfScnBy>
                 </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/bagFactory"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/bagFactory"
+              element={
+
                 <NrjRequire>
                   <LzBagFactory></LzBagFactory>
                 </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/WstbgOdd"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/WstbgOdd"
+              element={
+
                 <NrjRequire>
                   <LzWstbgOdd />
                 </NrjRequire>
-              
-            }
-          ></Route>
+
+              }
+            ></Route>
 
 
-          <Route
-            path="/hcfCtgCnt"
-            element={
-              
+            <Route
+              path="/hcfCtgCnt"
+              element={
+
                 <NrjRequire>
                   <LzHcfctgCnt></LzHcfctgCnt>
                 </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/hcfCtgGrid"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/hcfCtgGrid"
+              element={
+
                 <NrjRequire>
                   <LzHcfctgCntGrid></LzHcfctgCntGrid>
                 </NrjRequire>
-              
-            }
-          ></Route>
+
+              }
+            ></Route>
 
 
-          <Route
-            path="/helpPage"
-            element={
-              
+            <Route
+              path="/helpPage"
+              element={
+
                 <NrjRequire>
                   <LzHelpPage></LzHelpPage>
                 </NrjRequire>
-              
-            }
-          ></Route>
 
-          <Route
-            path="/hcf_wstbg"
-            element={
-              
+              }
+            ></Route>
+
+            <Route
+              path="/hcf_wstbg"
+              element={
+
                 <NrjRequire>
                   <LzHcf_Wstbg></LzHcf_Wstbg>
                 </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/srch_hcf"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/srch_hcf"
+              element={
+
                 <NrjRequire>
                   <LzSrch_hcf></LzSrch_hcf>
                 </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/find_hcf"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/find_hcf"
+              element={
+
                 <NrjRequire>
                   <LzFind_HCF></LzFind_HCF>
                 </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/wstbgid"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/wstbgid"
+              element={
+
                 <NrjRequire>
                   <LzWstbgid></LzWstbgid>
                 </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/changePwdRgd"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/changePwdRgd"
+              element={
+
                 <NrjRequire>
                   <LzChangePswRgd></LzChangePswRgd>
                 </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/changePwdSpcb"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/changePwdSpcb"
+              element={
+
                 <NrjRequire>
                   <LzChangePswSpcb></LzChangePswSpcb>
                 </NrjRequire>
-              
-            }
-          ></Route>
 
-          <Route
-            path="/cbwtfAnnulrptcp"
-            element={
-              
+              }
+            ></Route>
+
+            <Route
+              path="/cbwtfAnnulrptcp"
+              element={
+
                 <NrjRequire>
                   <LzCbwtfAnnulRpt />
                 </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/cbwtfAnnulrptcpcb"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/cbwtfAnnulrptcpcb"
+              element={
+
                 <NrjRequire>
                   <LzCbwtfAnnulRptCpcb />
                 </NrjRequire>
-              
-            }
-          ></Route>
 
-          <Route
-            path="/cbwtfMonthlyrptcpcb"
-            element={
-              
+              }
+            ></Route>
+
+            <Route
+              path="/cbwtfMonthlyrptcpcb"
+              element={
+
                 <NrjRequire>
                   <LzCbwtfMonthlyRptCpcb />
                 </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/hcfAnnlRptcp"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/hcfAnnlRptcp"
+              element={
+
                 <NrjRequire>
                   <LzHcfAnnlPrtCpcb></LzHcfAnnlPrtCpcb>
                 </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/hcfMonthlyRptcp"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/hcfMonthlyRptcp"
+              element={
+
                 <NrjRequire>
                   <LzHcfMonthlyPrtCpcb></LzHcfMonthlyPrtCpcb>
                 </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/hcfMonthlyhRpt"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/hcfMonthlyhRpt"
+              element={
+
                 <NrjRequire>
                   <LzHcfMonthlyReport></LzHcfMonthlyReport>
                 </NrjRequire>
-              
-            }
-          ></Route>
 
-          <Route
-            path="/hcfMonthlyhRptFromTab"
-            element={
-              
+              }
+            ></Route>
+
+            <Route
+              path="/hcfMonthlyhRptFromTab"
+              element={
+
                 <NrjRequire>
                   <LzHcfMonthlyReportFormTab></LzHcfMonthlyReportFormTab>
                 </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/hcfAnnlRptcbcp"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/hcfAnnlRptcbcp"
+              element={
+
                 <LzHcfAnnlPrt></LzHcfAnnlPrt>
-              
-            }
-          ></Route>
-          <Route
-            path="/cbwtfdlyrep"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/cbwtfdlyrep"
+              element={
+
                 <NrjRequire>
                   <Lzcbwtfdlyrep></Lzcbwtfdlyrep>
                 </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/loginFiles"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/loginFiles"
+              element={
+
                 <NrjRequire>
                   <LzLoginFiles></LzLoginFiles>
                 </NrjRequire>
-              
-            }
-          ></Route> <Route
-            path="/hospitalModified"
-            element={
-              
+
+              }
+            ></Route> <Route
+              path="/hospitalModified"
+              element={
+
                 <NrjRequire>
                   <LzHospitalModified></LzHospitalModified>
                 </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/hcfwstbg"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/hcfwstbg"
+              element={
+
                 <NrjRequire>
                   <LzClrHcfWst></LzClrHcfWst>
                 </NrjRequire>
-              
-            }
-          ></Route>
 
-          <Route
-            path="/dashboardvb"
-            element={
-              
+              }
+            ></Route>
+
+            <Route
+              path="/dashboardvb"
+              element={
+
                 <NrjRequire>
                   <LzDashBoardNew />
                 </NrjRequire>
-              
-            }
-          ></Route>
 
-          <Route
-            path="/dailyReport"
-            element={
-              
+              }
+            ></Route>
+
+            <Route
+              path="/dailyReport"
+              element={
+
                 <NrjRequire>
                   <LzDailyReports />
                 </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/spcb_authorizationDetails"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/spcb_authorizationDetails"
+              element={
+
                 <NrjRequire>
                   < LzAuthorizationDetail />
                 </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/spcb_authorizationAndWaste"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/spcb_authorizationAndWaste"
+              element={
+
                 <NrjRequire>
                   <LzAuthorizationAndWaste />
                 </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/spcb_authorizationAndconsolidate"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/spcb_authorizationAndconsolidate"
+              element={
+
                 <NrjRequire>
                   <LzAuthorizationAndConsoliDate />
                 </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/spcb_authorizationAndWasteCp"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/spcb_authorizationAndWasteCp"
+              element={
+
                 <NrjRequire>
                   <LzAuthorizationAndWasteCpcb />
                 </NrjRequire>
-              
-            }
-          ></Route>
 
-          <Route
-            path="/spcb_sttMonthlyRptCpcb"
-            element={
-              
+              }
+            ></Route>
+
+            <Route
+              path="/spcb_sttMonthlyRptCpcb"
+              element={
+
                 <NrjRequire>
                   <LzSttMonthlyRptCpcb />
                 </NrjRequire>
-              
-            }
-          ></Route>
 
-          <Route
-            path="/stt_monthlyReport"
-            element={
-              
+              }
+            ></Route>
+
+            <Route
+              path="/stt_monthlyReport"
+              element={
+
                 <NrjRequire>
                   <LzStateMonthlyReport />
                 </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/spcb_captiveInformation"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/spcb_captiveInformation"
+              element={
+
                 <NrjRequire>
                   < LzCaptiveInformation />
                 </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/spcb_wasteInformation"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/spcb_wasteInformation"
+              element={
+
                 <NrjRequire>
                   < LzWasteInformation />
                 </NrjRequire>
-              
-            }
-          ></Route>
+
+              }
+            ></Route>
 
 
 
 
-          <Route
-            path="/actvrpt"
-            element={
-              
+            <Route
+              path="/actvrpt"
+              element={
+
                 <NrjRequire>
                   <LzBrdActvSmry
 
@@ -1516,7 +1536,7 @@ function App() {
                       {
                         field: "cbwtfnm",
                         width: 400,
-                         headerName: "Name of CBWTF",
+                        headerName: "Name of CBWTF",
                         tooltipField: 'cbwtfnm',
                         filter: "agTextColumnFilter",
                       },
@@ -1556,14 +1576,14 @@ function App() {
                     ]}
                   ></LzBrdActvSmry>
                 </NrjRequire>
-              
-            }
-          ></Route>
+
+              }
+            ></Route>
 
 
 
 
-          {/* <Route
+            {/* <Route
             path="/spcb_cbwtf"
             element={
               
@@ -1573,17 +1593,17 @@ function App() {
               
             }
           ></Route> */}
-          <Route
-            path="/allStateReport"
-            element={
-              
+            <Route
+              path="/allStateReport"
+              element={
+
                 <NrjRequire>
                   <LzAllStateReport></LzAllStateReport>
                 </NrjRequire>
-              
-            }
-          ></Route>
-          {/* <Route
+
+              }
+            ></Route>
+            {/* <Route
             path="/spcb_frst"
             element={
               
@@ -1624,84 +1644,84 @@ function App() {
             }
           ></Route> */}
 
-          <Route
-            path="/annlRpt"
-            element={
-              
+            <Route
+              path="/annlRpt"
+              element={
+
                 <NrjRequire>
                   <LzAnnlRpt />
                   {/* <LzAllAnnlReport></LzAllAnnlReport> */}
                 </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/annlMisc"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/annlMisc"
+              element={
+
                 <NrjRequire>
                   <LzAnnlMisc />
                 </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/annlEqp"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/annlEqp"
+              element={
+
                 <NrjRequire>
                   <LzAnnlEqp />
                 </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/annlWstStrg"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/annlWstStrg"
+              element={
+
                 <NrjRequire>
                   <LzAnnlWstStrg />
                 </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/annlWstWt"
-            element={
-              
+
+              }
+            ></Route>
+            <Route
+              path="/annlWstWt"
+              element={
+
                 <NrjRequire>
                   <LzAnnlWstWt />
                 </NrjRequire>
-              
-            }
-          ></Route>
-          <Route
-            path="/hcfregister_indepent"
-            element={
-              
-                <LzAuthorHcfRegiterIndpnt></LzAuthorHcfRegiterIndpnt>
-              
-            }
-          ></Route>
-          <Route
-            path="/hcfconsent_list"
-            element={
-              
-                <LzAuthorHcfConsentList></LzAuthorHcfConsentList>
-              
-            }
-          ></Route>
-          <Route
-            path="/hcfconsent_report"
-            element={
-              
-                <LzAuthorHcfConsentReport></LzAuthorHcfConsentReport>
-              
-            }
-          ></Route>
 
-        </Route>
-      </Routes>
+              }
+            ></Route>
+            <Route
+              path="/hcfregister_indepent"
+              element={
+
+                <LzAuthorHcfRegiterIndpnt></LzAuthorHcfRegiterIndpnt>
+
+              }
+            ></Route>
+            <Route
+              path="/hcfconsent_list"
+              element={
+
+                <LzAuthorHcfConsentList></LzAuthorHcfConsentList>
+
+              }
+            ></Route>
+            <Route
+              path="/hcfconsent_report"
+              element={
+
+                <LzAuthorHcfConsentReport></LzAuthorHcfConsentReport>
+
+              }
+            ></Route>
+
+          </Route>
+        </Routes>
       </React.Suspense>
       {/* <Tooltip title="Help" arrow>
         <IconButton
