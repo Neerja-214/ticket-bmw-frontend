@@ -2,7 +2,8 @@ import { useState } from "react";
 import { Button } from "@mui/material";
 import { useToaster } from "../components/reusable/ToasterContext";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import CPCB_Logo from '../images/CPCB_Logo.jpg'
+import CPCB_Logo from '../images/CPCB_Logo.jpg';
+import { useEffect } from "react";
 
 const Registration = () => {
   const { showToaster } = useToaster();
@@ -14,7 +15,9 @@ const Registration = () => {
     email: "",
     contactNumber: "",
     password: "",
-    confirmPassword: ""
+    confirmPassword: "",
+    entityName: "",   // ✅ new field
+    state: ""         // ✅ new field
   });
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] = useState(false);
@@ -59,9 +62,73 @@ const Registration = () => {
       email: "",
       contactNumber: "",
       password: "",
-      confirmPassword: ""
+      confirmPassword: "",
+      entityName: "",  // ✅ reset field
+      state: ""        // ✅ reset field
     });
   };
+
+  // state field added
+
+  const fallbackStates = [
+  "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
+  "Delhi", "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand",
+  "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur",
+  "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab", "Rajasthan",
+  "Sikkim", "Tamil Nadu", "Telangana", "Tripura", "Uttar Pradesh",
+  "Uttarakhand", "West Bengal"
+];
+
+
+const [states, setStates] = useState<string[]>(fallbackStates); // default to fallback
+
+  useEffect(() => {
+    const fetchStates = async () => {
+      try {
+        const response = await fetch("https://your-api-url.com/statelist");
+        const data = await response.json();
+
+        // assuming API returns: { states: ["Delhi", "Punjab", ...] }
+        if (Array.isArray(data.states)) {
+          setStates(data.states);
+        } else {
+          console.warn("Invalid state list from API, using fallback.");
+        }
+      } catch (error) {
+        console.error("Failed to fetch state list, using fallback:", error);
+      }
+    };
+
+    fetchStates();
+  }, []);
+
+  // roll 
+
+  const fallbackRoles = ["CBWTF", "HCF", "SPCB", "RD", "CPCB"];
+
+  const [roles, setRoles] = useState<string[]>(fallbackRoles);
+
+      useEffect(() => {
+      const fetchRoles = async () => {
+        try {
+          const response = await fetch("https://your-api-url.com/roles");
+          const data = await response.json();
+
+          // Adjust based on API structure
+          if (Array.isArray(data.roles)) {
+            setRoles(data.roles);
+          } else {
+            console.warn("Invalid role list from API, using fallback.");
+          }
+        } catch (error) {
+          console.error("Failed to fetch role list, using fallback:", error);
+        }
+      };
+
+      fetchRoles();
+    }, []);
+
+
 
   return (
     <div className="flex flex-col min-h-screen bg-blue-900 relative overflow-hidden">
@@ -110,9 +177,10 @@ const Registration = () => {
 </div>
 
 {/* Registration Form Section */}
-<div className="flex justify-center items-center min-h-screen pt-40 relative z-10 overflow-y-auto">
+<div className="flex justify-center items-center min-h-screen mt-10 pt-40 relative z-10 overflow-y-auto">
+  {/* border-blue-300 */}
   <div className="bg-gray-200 bg-opacity-20 backdrop-blur-sm p-8 rounded-2xl shadow-lg w-full max-w-2xl mx-4 my-8">
-    <div className="text-center mb-8">
+    <div className="text-center mb-4  mt-[200px] ">
       <h1 className="text-3xl font-bold text-white">Registration</h1>
     </div>
 
@@ -141,11 +209,9 @@ const Registration = () => {
             onChange={handleChange}
             className="mt-1 p-3 w-full border rounded-lg bg-white bg-opacity-10 focus:outline-none focus:ring-2 focus:ring-blue-300"
           >
-            <option value="CBWTF">CBWTF</option>
-            <option value="HCF">HCF</option>
-            <option value="SPCB">SPCB</option>
-            <option value="RD">RD</option>
-            <option value="CPCB">CPCB</option>
+            {roles.map((role) => (
+              <option key={role} value={role}>{role}</option>
+            ))}
           </select>
         </div>
         <div>
@@ -160,6 +226,44 @@ const Registration = () => {
           />
         </div>
       </div>
+
+
+      {/* State Dropdown */}
+
+      <div>
+      <label className="block text-sm font-medium text-white mb-2">Select State</label>
+      <select
+        name="state"
+        value={formData.state}
+        onChange={handleChange}
+        className="mt-1 p-3 w-full border rounded-lg bg-white bg-opacity-10 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-300"
+        required
+      >
+        <option value="">-- Select State --</option>
+        {states.map((state) => (
+          <option key={state} value={state}>{state}</option>
+        ))}
+      </select>
+    </div>
+
+
+      {/* Conditional CBWTF Name / HCF Name */}
+      {(formData.role === "CBWTF" || formData.role === "HCF") && (
+        <div>
+          <label className="block text-sm font-medium text-white mb-2">
+            {formData.role === "CBWTF" ? "CBWTF Name" : "HCF Name"}
+          </label>
+          <input
+            type="text"
+            name="entityName"
+            value={formData.entityName}
+            onChange={handleChange}
+            className="mt-1 p-3 w-full border rounded-lg bg-white bg-opacity-10 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-300"
+            placeholder={`Enter ${formData.role === "CBWTF" ? "CBWTF" : "HCF"} Name`}
+            required
+          />
+        </div>
+      )}
 
       {/* Full Name */}
       <div>
