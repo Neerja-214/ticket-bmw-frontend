@@ -16,6 +16,21 @@ import utilities, {
   getUsrnm,
   postLinux,
 } from "../utilities/utilities";
+
+import { 
+  FiHome, 
+  FiList, 
+  FiAlertCircle, 
+  FiCornerUpLeft,
+  FiSettings,
+  FiUsers,
+  FiFileText,
+  FiLogOut,
+  FiGrid
+} from "react-icons/fi";
+
+
+
 const Dashboard = () => {
   const navigate = useNavigate();
 
@@ -142,30 +157,32 @@ const Dashboard = () => {
 
 
         {/* NEW: Top Menu Bar */}
-      <div className="bg-blue-500 text-white px-4 py-2 shadow-md">
-        <div className="container mx-auto flex justify-between items-center">
-          <div className="flex space-x-4">
-            <button 
-              onClick={() => navigate("/dashboard")}
-              className="hover:bg-blue-700 px-3 py-1 rounded transition-colors"
-            >
-              Home
-            </button>
-          </div>
-          
-          <div className="flex items-center space-x-4">
-            <span className="text-sm">
-              Logged in as: <span className="font-semibold">{userRole}</span>
-            </span>
-            <button
-              onClick={handleLogout}
-              className="bg-red-600 hover:bg-red-700 px-3 py-1 rounded transition-colors"
-            >
-              Logout
-            </button>
-          </div>
-        </div>
-      </div>
+    <div className="bg-blue-500 text-white px-4 py-2 shadow-md">
+  <div className="container mx-auto flex justify-between items-center">
+    <div className="flex space-x-4">
+      <button 
+        onClick={() => navigate("/dashboard")}
+        className="flex items-center hover:bg-blue-700 px-3 py-1 rounded transition-colors"
+      >
+        <FiHome className="mr-2" />
+        Home
+      </button>
+    </div>
+    
+    <div className="flex items-center space-x-4">
+      <span className="text-sm">
+        Logged in as: <span className="font-semibold">{userRole}</span>
+      </span>
+      <button
+        onClick={handleLogout}
+        className="flex items-center bg-red-600 hover:bg-red-700 px-3 py-1 rounded transition-colors"
+      >
+        <FiLogOut className="mr-2" />
+        Logout
+      </button>
+    </div>
+  </div>
+</div>
 
       {/* Main Content */}
       <div className="flex flex-1 overflow-hidden">
@@ -173,7 +190,7 @@ const Dashboard = () => {
         <div className="w-64 bg-black text-white p-4 shadow-lg">
           <h2 className="text-xl font-bold mb-6 ml-8">Ticket Tracker</h2>
           
-          <nav>
+          {/* <nav>
             <ul className="space-y-2">
               {["Dashboard", "All Tickets", "Open Tickets", "Reverted Tickets"].map((item) => (
                 <li key={item}>
@@ -186,7 +203,39 @@ const Dashboard = () => {
                 </li>
               ))}
             </ul>
-          </nav>
+          </nav> */}
+
+
+          <nav>
+            <ul className="space-y-2">
+                {[
+                { name: "Dashboard", icon: <FiGrid className="mr-3" /> },
+                { name: "All Tickets", icon: <FiList className="mr-3" /> },
+                { name: "Open Tickets", icon: <FiAlertCircle className="mr-3" /> },
+                { name: "Reverted Tickets", icon: <FiCornerUpLeft className="mr-3" /> },
+                // { name: "User Management", icon: <FiUsers className="mr-3" /> },
+                // { name: "Reports", icon: <FiFileText className="mr-3" /> },
+                // { name: "Settings", icon: <FiSettings className="mr-3" /> }
+                ].map((item) => (
+                <li key={item.name}>
+                    <button
+                    onClick={() => handleMenuClick(item.name)}
+                    className={`w-full flex items-center text-left px-4 py-3 rounded-lg transition-colors ${
+                        activeMenu === item.name 
+                        ? 'bg-blue-500 text-white' 
+                        : 'text-gray-300 hover:bg-blue-500 hover:text-white'
+                    }`}
+                    >
+                    {item.icon}
+                    {item.name}
+                    </button>
+                </li>
+                ))}
+            </ul>
+            </nav>
+
+          
+
         </div>
 
         {/* Main Dashboard Content */}
