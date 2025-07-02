@@ -3,6 +3,8 @@ import { Button } from "@mui/material";
 import { useToaster } from "../components/reusable/ToasterContext";
 import CPCB_Logo from '../images/CPCB_Logo.jpg';
 import { useEffect } from "react";
+import { genericPostAPI } from "../services/apiService"; // Import your generic API function
+
 const LodgeComplaint = () => {
   const { showToaster } = useToaster();
   const [formData, setFormData] = useState({
@@ -14,6 +16,8 @@ const LodgeComplaint = () => {
     description: "",
     what_fnct: "bmwticket_raise_compaint"
   });
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
 
   useEffect(() => {
@@ -110,27 +114,26 @@ const submitToAPI = async () => {
   };
 
 
-  // console.log("Submitting payload:", payload);
-  // return
-  try {
-    const response = await fetch("https://bmwapp.barcodebmw.in/bmw/myApp", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(payload)
-    });
+   setIsSubmitting(true);
 
-    const data = await response.json();
-    if (data.status === "success") {
+   try {
+    const data = await genericPostAPI("bmw/myApp", payload);
+
+    if (data?.status === "success") {
       showToaster([data.message], "success");
-      console.log("Ticket ID:", data.result[0]);
+      console.log("Ticket ID:", data.result?.[0]);
+
     } else {
-      showToaster([data.message || "Failed to raise complaint"], "error");
+      showToaster([data?.message || "Failed to raise complaint"], "error");
     }
-  } catch (err) {
-    console.error(err);
-    showToaster(["Something went wrong while submitting the complaint."], "error");
+  } catch (err: any) {
+    console.error("Submission Error:", err);
+    showToaster(
+      [err?.message || "Something went wrong while submitting the complaint."],
+      "error"
+    );
+  } finally {
+    setIsSubmitting(false); // 🔓 Enable button
   }
 };
 
@@ -291,9 +294,10 @@ const submitToAPI = async () => {
               type="submit"
               fullWidth
               variant="contained"
-              className="w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg font-medium mt-6 transition-colors"
+              className="w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg font-medium mt-6 transition-colors disabled:opacity-50"
+               disabled={isSubmitting}
             >
-              Generate Ticket
+             {isSubmitting ? "Generating Ticket..." : "Generate Ticket"}
             </Button>
           </form>
         </div>
