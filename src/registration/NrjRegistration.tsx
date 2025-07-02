@@ -3,6 +3,7 @@ import { Button } from "@mui/material";
 import { useToaster } from "../components/reusable/ToasterContext";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import CPCB_Logo from '../images/CPCB_Logo.jpg';
+import { genericPostAPI } from "../services/apiService"; // Import your generic API function
 
 const Registration = () => {
   const { showToaster } = useToaster();
@@ -18,6 +19,9 @@ const Registration = () => {
     entityName: "",
     state: ""
   });
+
+    const [isSubmitting, setIsSubmitting] = useState(false);
+  
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] = useState(false);
 
@@ -118,23 +122,16 @@ const Registration = () => {
     // return;
 
 
-  try {
-    const response = await fetch("https://bmwapp.barcodebmw.in/bmw/myApp", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(payload)
-    });
+    setIsSubmitting(true); // 🔒 Disable button
 
-    const result = await response.json();
+   try {
+    const result = await genericPostAPI("bmw/myApp", payload);
 
     if (result.status === "success") {
       showToaster(["Registration successful"], "success");
 
       // Reset form
       setFormData({
-        // companyName: "",
         role: "CBWTF",
         eprNumber: "",
         fullName: "",
@@ -148,10 +145,14 @@ const Registration = () => {
     } else {
       showToaster([result.message || "Something went wrong"], "error");
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error("API error:", error);
     showToaster(["Failed to register. Please try again later."], "error");
+  } finally {
+    setIsSubmitting(false); // 🔓 Enable button
   }
+
+
 };
     
   //   setFormData({
@@ -444,9 +445,10 @@ const Registration = () => {
               type="submit"
               fullWidth
               variant="contained"
-              className="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm font-medium mt-4"
-            >
-              Register
+              className="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm font-medium mt-4 disabled:opacity-50"
+              disabled={isSubmitting}
+           >
+             {isSubmitting ? "Registering..." : "Register"}
             </Button>
           </form>
         </div>
