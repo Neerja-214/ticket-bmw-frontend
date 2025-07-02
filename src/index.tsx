@@ -8,7 +8,7 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+// import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import "rsuite/dist/rsuite.min.css";
 import "rsuite/dist/rsuite.css";
 import 'ag-grid-community/styles/ag-grid.css';
@@ -52,7 +52,7 @@ root.render(
           </BrowserRouter>
         </PersistGate>
       </Provider>
-      <ReactQueryDevtools />
+      {/* <ReactQueryDevtools initialIsOpen={false}/> */}
     </QueryClientProvider>
 
   </React.StrictMode>
