@@ -335,7 +335,6 @@ const AllTickets: React.FC = () => {
             who={getWho()}
             sortBy={'ticketId'}
             showExport={true}
-            showExportExcel={true}
             exceColWidth={excelColWidth}
             KeyOrder={keyOrder}
             pageTitle={'All Tickets Report: '}
