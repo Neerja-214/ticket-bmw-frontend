@@ -50,6 +50,15 @@ const Registration = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/;
+
+      if (!passwordRegex.test(formData.password)) {
+        showToaster([
+          "Password must be at least 6 characters and include uppercase, lowercase, and a number"
+        ], "error");
+        return;
+      }
     
     if (formData.password !== formData.confirmPassword) {
       showToaster(["Passwords do not match"], "error");
@@ -62,10 +71,31 @@ const Registration = () => {
       return;
     }
 
+      // Email format check
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.email)) {
+        showToaster(["Please enter a valid email address"], "error");
+        return;
+      }
+
     if (!/^\d{10}$/.test(formData.contactNumber)) {
       showToaster(["Enter a valid 10-digit contact number"], "error");
       return;
     }
+
+
+    // Password strength check (at least 6 characters, can customize more)
+  if (formData.password.length < 6) {
+    showToaster(["Password must be at least 6 characters"], "error");
+    return;
+  }
+
+  // Entity name required for CBWTF or HCF
+  const role = formData.role.toLowerCase();
+  if ((role === "cbwtf" || role === "hcf") && !formData.entityName.trim()) {
+    showToaster([`${formData.role} Name is required`], "error");
+    return;
+  }
     
     console.log("Form submitted:", formData);
     // showToaster(["Registration successful"], "success");
@@ -83,6 +113,10 @@ const Registration = () => {
   if(formData.role.toLowerCase() === "cbwtf" || formData.role.toLowerCase() === "hcf") {
     payload.company_name = formData.entityName; // 👈 Use entity name for CBWTF/HCF
   }
+
+    // console.log("payload:", payload);
+    // return;
+
 
   try {
     const response = await fetch("https://biowaste.in/myApp", {
