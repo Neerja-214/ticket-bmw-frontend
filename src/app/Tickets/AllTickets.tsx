@@ -8,6 +8,24 @@ import moment from 'moment';
 import { UseMomentDateNmb } from '../../Hooks/useMomentDtArry';
 import CPCB_Logo from '../../images/CPCB_Logo.jpg';
 import { Modal, Button, Box, Typography, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import ConfirmationNumberIcon from '@mui/icons-material/ConfirmationNumber';
+
+// Define type for ticket data
+type TicketData = {
+  ticketId: string;
+  issueType: string;
+  generatedOn: string;
+  reviewedOn: string;
+  reviewedBy: string;
+  complainantName: string;
+  complainantEmail: string;
+  complainantPhone: string;
+  closedDate: string;
+  issue: string;
+  screenshots: string[];
+  ticketStatus: string;
+  assignedTo: string;
+};
 
 // Reducer actions
 const ACTIONS = {
@@ -25,7 +43,7 @@ const initialState = {
 
 type TicketState = {
   triggerG: number;
-  nwRow: any[];
+  nwRow: TicketData[];
   rndm: number;
 };
 
@@ -60,7 +78,7 @@ const CustomButtonRenderer = (params: any) => {
       {params.buttons.map((btn: any) => (
         <button
           key={btn.colId}
-          onClick={() => params.onButtonClicked(btn.buttonText, params.data)}
+          onClick={() => params.onButtonClicked(btn.buttonText, params.data as TicketData)}
           className="px-3 py-1 bg-blue-700 text-white rounded hover:bg-blue-800 text-sm"
         >
           {btn.buttonText}
@@ -71,7 +89,7 @@ const CustomButtonRenderer = (params: any) => {
 };
 
 // Dummy data for the grid
-const dummyData = [
+const dummyData: TicketData[] = [
   {
     ticketId: 'TCK001',
     issueType: 'System Error',
@@ -119,6 +137,30 @@ const dummyData = [
   },
 ];
 
+// Static data for ticket trail
+const dummyTrailData = [
+  {
+    date: '01-Jul-2025 10:00 AM',
+    status: 'OPEN',
+    details: 'Ticket created by Alice Johnson.',
+  },
+  {
+    date: '02-Jul-2025 09:00 AM',
+    status: 'REVIEWING',
+    details: 'Ticket assigned to John Doe for review.',
+  },
+  {
+    date: '02-Jul-2025 03:00 PM',
+    status: 'PROGRESS',
+    details: 'Investigation started, issue identified as server timeout.',
+  },
+  {
+    date: '03-Jul-2025 11:00 AM',
+    status: 'CLOSED',
+    details: 'Issue resolved by updating server configuration.',
+  },
+];
+
 // Mock officers list for Assign to dropdown
 const officers = ['John Doe', 'Jane Smith', 'Michael Brown', ''];
 
@@ -127,13 +169,15 @@ const AllTickets: React.FC = () => {
   const { showToaster } = useToaster();
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [assignModalOpen, setAssignModalOpen] = useState(false);
-  const [selectedTicket, setSelectedTicket] = useState<any>(null);
+  const [trailModalOpen, setTrailModalOpen] = useState(false);
+  const [selectedTicket, setSelectedTicket] = useState<TicketData | null>(null);
+  const [showFullTrail, setShowFullTrail] = useState(false);
 
   // Column definitions for the grid
   const coldef = [
     { field: 'ticketId', headerName: 'Ticket ID', width: 150, filter: 'agTextColumnFilter', tooltipField: 'ticketId' },
     { field: 'issueType', headerName: 'Issue Type', width: 200, filter: 'agTextColumnFilter', tooltipField: 'issueType' },
-    { field: 'generatedOn', headerName: 'Generated On', width: 180, filter: 'agTextColumnFilter', tooltipField: 'generatedOn' },
+    { field: 'generatedOn', headerName: 'Generated On', type: 'date', width: 180, filter: 'agTextColumnFilter', tooltipField: 'generatedOn' },
     { field: 'reviewedOn', headerName: 'Reviewed On', width: 180, filter: 'agTextColumnFilter', tooltipField: 'reviewedOn' },
     { field: 'reviewedBy', headerName: 'Reviewed By', width: 200, filter: 'agTextColumnFilter', tooltipField: 'reviewedBy' },
     {
@@ -142,7 +186,7 @@ const AllTickets: React.FC = () => {
       width: 400,
       cellRenderer: CustomButtonRenderer,
       cellRendererParams: (params: any) => ({
-        onButtonClicked: (buttonText: string, data: any) => onButtonClicked(buttonText, data),
+        onButtonClicked: (buttonText: string, data: TicketData) => onButtonClicked(buttonText, data),
         buttons: [
           { buttonText: 'View Ticket', colId: 'viewTicket', showApi: 'view|ticketId|[ticketId]' },
           { buttonText: 'Ticket Trail', colId: 'ticketTrail', showApi: 'trail|ticketId|[ticketId]' },
@@ -189,12 +233,20 @@ const AllTickets: React.FC = () => {
   };
 
   // Mock API for fetching ticket details
-  const fetchTicketDetails = async (ticketId: string) => {
-    // Simulate API call
+  const fetchTicketDetails = async (ticketId: string): Promise<TicketData | null> => {
     const ticket = dummyData.find((t) => t.ticketId === ticketId);
-    return ticket || {};
+    return ticket || null;
     // Uncomment for actual API
-    // return nrjAxiosRequest('viewTicket', { ticketId });
+    // const response = await nrjAxiosRequest('viewTicket', { ticketId });
+    // return response.data || null;
+  };
+
+  // Mock API for fetching ticket trail
+  const fetchTicketTrail = async (ticketId: string) => {
+    // Simulate API call
+    return dummyTrailData;
+    // Uncomment for actual API
+    // return nrjAxiosRequest('ticketTrail', { ticketId });
   };
 
   // Process fetched data for grid
@@ -236,14 +288,15 @@ const AllTickets: React.FC = () => {
     console.log('Selected row:', data);
   };
 
-  const onButtonClicked = async (action: string, rowData: any) => {
+  const onButtonClicked = async (action: string, rowData: TicketData) => {
     if (action === 'View Ticket') {
       const ticketDetails = await fetchTicketDetails(rowData.ticketId);
       setSelectedTicket(ticketDetails);
       setViewModalOpen(true);
     } else if (action === 'Ticket Trail') {
-      // Placeholder for separate Ticket Trail component
-      console.log('Ticket Trail clicked for:', rowData.ticketId, 'To be implemented in separate component');
+      const ticketDetails = await fetchTicketDetails(rowData.ticketId);
+      setSelectedTicket(ticketDetails);
+      setTrailModalOpen(true);
     } else if (action === 'Assign Officer') {
       const ticketDetails = await fetchTicketDetails(rowData.ticketId);
       setSelectedTicket(ticketDetails);
@@ -261,13 +314,31 @@ const AllTickets: React.FC = () => {
     setSelectedTicket(null);
   };
 
+  const handleCloseTrailModal = () => {
+    setTrailModalOpen(false);
+    setSelectedTicket(null);
+    setShowFullTrail(false);
+  };
+
   const handleUpdateAssign = () => {
-    // Placeholder for update API call
     console.log('Update clicked for:', selectedTicket?.ticketId, 'Assigned to:', selectedTicket?.assignedTo);
     showToaster(['Assignment updated successfully'], 'success');
     setAssignModalOpen(false);
     setSelectedTicket(null);
   };
+
+  const handleViewFullTrail = async () => {
+    setShowFullTrail(true);
+    // Fetch trail data (using static data for now)
+    const trailData = await fetchTicketTrail(selectedTicket?.ticketId || '');
+    console.log('Fetched trail data:', trailData);
+  };
+
+  // Determine the index of the current status
+  const statusOrder = ['OPEN', 'REVIEWING', 'PROGRESS', 'CLOSED'];
+  const currentStatusIndex = selectedTicket?.ticketStatus
+    ? statusOrder.indexOf(selectedTicket.ticketStatus.toUpperCase())
+    : -1;
 
   return (
     <div className="flex flex-col bg-blue-900 relative overflow-y-auto min-h-screen">
@@ -400,7 +471,10 @@ const AllTickets: React.FC = () => {
               variant="contained"
               color="primary"
               sx={{ mt: 2 }}
-              onClick={() => console.log('View Trail clicked for:', selectedTicket?.ticketId, 'To be implemented in separate component')}
+              onClick={() => {
+                setViewModalOpen(false);
+                setTrailModalOpen(true);
+              }}
             >
               View Trail
             </Button>
@@ -483,7 +557,118 @@ const AllTickets: React.FC = () => {
         </Box>
       </Modal>
 
-      {/* Blob Animation Styles */}
+      {/* Ticket Trail Modal */}
+      <Modal open={trailModalOpen} onClose={handleCloseTrailModal}>
+        <Box
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: { xs: '90%', sm: 600 },
+            bgcolor: 'background.paper',
+            boxShadow: 24,
+            p: 4,
+            borderRadius: 2,
+            maxHeight: '80vh',
+            overflowY: 'auto',
+          }}
+        >
+          <Typography variant="h6" component="h2" gutterBottom>
+            Ticket Trail: {selectedTicket?.ticketId || 'N/A'}
+          </Typography>
+          <Box sx={{ mt: 2 }}>
+            {/* Stepper */}
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4, position: 'relative' }}>
+              {statusOrder.map((status, index) => (
+                <Box key={status} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, zIndex: 1 }}>
+                  <Box
+                    sx={{
+                      width: 12,
+                      height: 12,
+                      borderRadius: '50%',
+                      backgroundColor: index <= currentStatusIndex && currentStatusIndex !== -1 ? '#b45309' : '#000000',
+                      animation: index === currentStatusIndex && currentStatusIndex !== -1 ? 'pulse 1.5s infinite' : 'none',
+                      mb: 1,
+                    }}
+                  />
+                  <Typography variant="caption" sx={{ color: index <= currentStatusIndex && currentStatusIndex !== -1 ? '#b45309' : '#000000' }}>
+                    {status}
+                  </Typography>
+                </Box>
+              ))}
+              {/* Connecting Lines */}
+              {statusOrder.slice(0, -1).map((_, index) => (
+                <Box
+                  key={`line-${index}`}
+                  sx={{
+                    position: 'absolute',
+                    top: 5,
+                    left: `${(index + 0.5) * (100 / statusOrder.length)}%`,
+                    width: `${100 / statusOrder.length}%`,
+                    height: 2,
+                    backgroundColor: index < currentStatusIndex && currentStatusIndex !== -1 ? '#b45309' : '#000000',
+                    zIndex: 0,
+                  }}
+                />
+              ))}
+            </Box>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleViewFullTrail}
+              sx={{ mb: 2 }}
+              style={{ textTransform: 'none' }}
+            >
+              View Full Details
+            </Button>
+            {showFullTrail && (
+              <Box sx={{ mt: 2 }}>
+                {dummyTrailData.map((trail, index) => (
+                  <Box key={index} sx={{ display: 'flex', alignItems: 'flex-start', mb: 2 }}>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mr: 2 }}>
+                      <Box
+                        sx={{
+                          width: 16,
+                          height: 16,
+                          borderRadius: '50%',
+                          backgroundColor: 'primary.main',
+                        }}
+                      />
+                      {index < dummyTrailData.length - 1 && (
+                        <Box
+                          sx={{
+                            width: 2,
+                            flex: 1,
+                            backgroundColor: 'grey.400',
+                            height: 60,
+                          }}
+                        />
+                      )}
+                    </Box>
+                    <Box>
+                      <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                        {trail.date}
+                      </Typography>
+                      <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+                        {trail.status}
+                      </Typography>
+                      <Typography variant="body2">{trail.details}</Typography>
+                    </Box>
+                  </Box>
+                ))}
+              </Box>
+            )}
+          </Box>
+          <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
+            <Button onClick={handleCloseTrailModal} style={{ textTransform: 'none' }}>
+              Close
+            </Button>
+          </Box>
+        </Box>
+      </Modal>
+
+      {/* Styles */}
       <style>
         {`
           @keyframes blob {
@@ -496,6 +681,11 @@ const AllTickets: React.FC = () => {
           }
           .animation-delay-2000 { animation-delay: 2s; }
           .animation-delay-4000 { animation-delay: 4s; }
+          @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.5); }
+            100% { transform: scale(1); }
+          }
         `}
       </style>
     </div>
