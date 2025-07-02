@@ -336,7 +336,6 @@ const BagCbwtfScnBy = (props: any) => {
         let ary: any = dataSvd.data;
         if (Array.isArray(ary)) {
             let uniqueAry: any = {};
-debugger
             ary.forEach((element: any) => {
                 let data = getCntWtInNumbers(element)
                 if (!uniqueAry[element.cbwtfnm]) {

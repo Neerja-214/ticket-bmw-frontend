@@ -2,15 +2,40 @@ import { useState } from "react";
 import { Button } from "@mui/material";
 import { useToaster } from "../components/reusable/ToasterContext";
 import CPCB_Logo from '../images/CPCB_Logo.jpg';
-
+import { useEffect } from "react";
 const LodgeComplaint = () => {
   const { showToaster } = useToaster();
   const [formData, setFormData] = useState({
     email: "",
     file: null as File | null,
+    image_1: "", // base64 string for image
+    stt: "MP", // example state
     issueType: "",
-    description: ""
+    description: "",
+    what_fnct: "bmwticket_raise_compaint"
   });
+
+
+  useEffect(() => {
+  const fetchStates = async () => {
+    try {
+      const res = await fetch("https://example.com/api/states"); // replace with real API
+      const data = await res.json();
+      
+      if (Array.isArray(data) && data.length) {
+        // Replace static with dynamic states if available
+        setStateList(data.map((item: any) => ({
+          code: item.code || item.stateCode || item.id,
+          name: item.name || item.stateName
+        })));
+      }
+    } catch (error) {
+      console.warn("Failed to fetch states, using static list.");
+    }
+  };
+
+  fetchStates();
+}, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -20,38 +45,98 @@ const LodgeComplaint = () => {
     }));
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      if (file.type !== "application/pdf") {
-        showToaster(["Please upload only PDF files"], "error");
-        return;
-      }
-      setFormData(prev => ({
-        ...prev,
-        file: file
-      }));
-    }
+ 
+
+  const [stateList, setStateList] = useState([
+  { code: "MP", name: "Madhya Pradesh" },
+  { code: "UP", name: "Uttar Pradesh" },
+  { code: "MH", name: "Maharashtra" }
+]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+  if (!formData.email || !formData.issueType) {
+    showToaster(["Please fill all required fields"], "error");
+    return;
+  }
+
+  await submitToAPI();
+
+  setFormData({
+    email: "",
+    file: null,
+    image_1: "",
+    issueType: "",
+    description: "",
+    stt: "MP",
+    what_fnct: "bmwticket_raise_compaint"
+  });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!formData.email || !formData.issueType) {
-      showToaster(["Please fill all required fields"], "error");
+
+const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  if (e.target.files && e.target.files[0]) {
+    const file = e.target.files[0];
+    const validTypes = ["application/pdf", "image/png", "image/jpeg"];
+
+    if (!validTypes.includes(file.type)) {
+      showToaster(["Only PDF or Image files (PNG, JPEG) are allowed"], "error");
       return;
     }
-    
-    console.log("Ticket generated:", formData);
-    showToaster(["Ticket generated successfully"], "success");
-    
-    setFormData({
-      email: "",
-      file: null,
-      issueType: "",
-      description: ""
-    });
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setFormData(prev => ({
+        ...prev,
+        file,
+        image_1: reader.result as string
+      }));
+    };
+    reader.readAsDataURL(file);
+  }
+};
+
+
+const submitToAPI = async () => {
+  const payload = {
+    email: formData.email,
+    issue_type: formData.issueType,
+    description: formData.description,
+    image_1: formData.image_1,
+    // image_2: formData.image_2,
+    stt: formData.stt,
+    what_fnct: formData.what_fnct
   };
+
+
+  // console.log("Submitting payload:", payload);
+  // return
+  try {
+    const response = await fetch("https://bmwapp.barcodebmw.in/bmw/myApp", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await response.json();
+    if (data.status === "success") {
+      showToaster([data.message], "success");
+      console.log("Ticket ID:", data.result[0]);
+    } else {
+      showToaster([data.message || "Failed to raise complaint"], "error");
+    }
+  } catch (err) {
+    console.error(err);
+    showToaster(["Something went wrong while submitting the complaint."], "error");
+  }
+};
+
+
+
+
 
   return (
     <div className="flex flex-col min-h-screen bg-blue-900 relative overflow-hidden">
@@ -121,7 +206,24 @@ const LodgeComplaint = () => {
               />
             </div>
 
-         
+
+
+            <div>
+              <label className="block text-sm font-medium text-white mb-2">
+               State
+              </label>
+           <select
+              name="stt"
+              value={formData.stt}
+              onChange={handleChange}
+              className="mt-1 p-3 w-full border rounded-lg bg-white bg-opacity-10  focus:outline-none focus:ring-2 focus:ring-blue-300 "
+            >
+              <option value="MP">Madhya Pradesh</option>
+              <option value="UP">Uttar Pradesh</option>
+              <option value="MH">Maharashtra</option>
+              {/* Add more states as needed */}
+            </select>
+           </div>
 
             {/* Issue Type Dropdown */}
             <div>
@@ -171,7 +273,7 @@ const LodgeComplaint = () => {
                   </span>
                   <input
                     type="file"
-                    accept=".pdf"
+                    accept=".pdf, image/png, image/jpeg"
                     onChange={handleFileChange}
                     className="hidden"
                   />
