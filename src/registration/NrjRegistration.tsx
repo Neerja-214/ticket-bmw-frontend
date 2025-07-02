@@ -119,7 +119,7 @@ const Registration = () => {
 
 
   try {
-    const response = await fetch("https://biowaste.in/myApp", {
+    const response = await fetch("https://bmwapp.barcodebmw.in/bmw/myApp", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
