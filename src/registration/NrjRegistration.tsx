@@ -7,7 +7,7 @@ import CPCB_Logo from '../images/CPCB_Logo.jpg';
 const Registration = () => {
   const { showToaster } = useToaster();
   const [formData, setFormData] = useState({
-    companyName: "",
+    // companyName: "",
     role: "CBWTF",
     eprNumber: "",
     fullName: "",
@@ -37,7 +37,18 @@ const Registration = () => {
     setIsConfirmPasswordVisible(!isConfirmPasswordVisible);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+
+  interface SignupPayload {
+  nme: string;
+  eml: string;
+  mobile_no: string;
+  role: string;
+  state: string;
+  what_fnct: string;
+  company_name?: string;
+}
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (formData.password !== formData.confirmPassword) {
@@ -45,27 +56,85 @@ const Registration = () => {
       return;
     }
     
-    if (!formData.companyName || !formData.fullName || !formData.email || !formData.contactNumber) {
+    // !formData.companyName ||
+    if ( !formData.fullName || !formData.email || !formData.contactNumber) {
       showToaster(["Please fill all required fields"], "error");
+      return;
+    }
+
+    if (!/^\d{10}$/.test(formData.contactNumber)) {
+      showToaster(["Enter a valid 10-digit contact number"], "error");
       return;
     }
     
     console.log("Form submitted:", formData);
-    showToaster(["Registration successful"], "success");
-    
-    setFormData({
-      companyName: "",
-      role: "CBWTF",
-      eprNumber: "",
-      fullName: "",
-      email: "",
-      contactNumber: "",
-      password: "",
-      confirmPassword: "",
-      entityName: "",
-      state: ""
-    });
+    // showToaster(["Registration successful"], "success");
+
+    const payload: SignupPayload  = {
+    nme: formData.fullName, // 👈 Use full name as "User Name"
+    eml: formData.email,
+    mobile_no: formData.contactNumber,
+    // company_name: formData.companyName,
+    role: formData.role.toLowerCase(),
+    state: formData.state,
+    what_fnct: "bmwticket_ticket_tracker_signup"
   };
+
+  if(formData.role.toLowerCase() === "cbwtf" || formData.role.toLowerCase() === "hcf") {
+    payload.company_name = formData.entityName; // 👈 Use entity name for CBWTF/HCF
+  }
+
+  try {
+    const response = await fetch("https://biowaste.in/myApp", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const result = await response.json();
+
+    if (result.status === "success") {
+      showToaster(["Registration successful"], "success");
+
+      // Reset form
+      setFormData({
+        // companyName: "",
+        role: "CBWTF",
+        eprNumber: "",
+        fullName: "",
+        email: "",
+        contactNumber: "",
+        password: "",
+        confirmPassword: "",
+        entityName: "",
+        state: ""
+      });
+    } else {
+      showToaster([result.message || "Something went wrong"], "error");
+    }
+  } catch (error) {
+    console.error("API error:", error);
+    showToaster(["Failed to register. Please try again later."], "error");
+  }
+};
+    
+  //   setFormData({
+  //     companyName: "",
+  //     role: "CBWTF",
+  //     eprNumber: "",
+  //     fullName: "",
+  //     email: "",
+  //     contactNumber: "",
+  //     password: "",
+  //     confirmPassword: "",
+  //     entityName: "",  // ✅ reset field
+  //     state: ""        // ✅ reset field
+  //   });
+  // };
+
+  // state field added
 
   const fallbackStates = [
     "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
@@ -170,7 +239,7 @@ const Registration = () => {
 
           <form className="space-y-4" onSubmit={handleSubmit}>
             {/* User Name */}
-            <div>
+            {/* <div>
               <label className="block text-xs font-medium text-white mb-1">User Name</label>
               <input
                 type="text"
@@ -181,7 +250,7 @@ const Registration = () => {
                 placeholder="Provide the User name"
                 required
               />
-            </div>
+            </div> */}
 
             {/* Role and Registration Number */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
