@@ -29,6 +29,10 @@ import {
   FiGrid
 } from "react-icons/fi";
 
+import { genericPostAPI } from "../services/apiService"; // Import your generic API function
+import { useToaster } from "../components/reusable/ToasterContext";
+
+
 
 
 const Dashboard = () => {
@@ -104,6 +108,59 @@ const Dashboard = () => {
 
     fetchDashboardData();
   }, []);
+
+  const { showToaster } = useToaster();
+
+  useEffect(() => {
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+
+      const payload = {
+        what_fnct: "bmwticket_get_dashboard_data"
+      };
+
+      const data = await genericPostAPI("bmw/myApp", payload);
+
+      if (data?.status === "success" && data.result) {
+        // Show success toaster (optional)
+        // showToaster([data.message], "success");
+
+        const result = data.result;
+
+        setStats({
+          unassigned: result.initiated || 0,
+          revertedToHelpDesk: 0, // Not in API
+          withOfficers: result.assigned_officer_summary
+            ? Object.values(result.assigned_officer_summary).reduce((a: number, b: any) => a + Number(b), 0)
+            : 0,
+          revertedToDivision: 0, // Not in API
+          underReview: result["under review"] || 0,
+          closed: result.closed || 0
+        });
+
+        const departmentsArray = result.assigned_officer_summary
+          ? Object.entries(result.assigned_officer_summary).map(([name, count]) => ({
+              name,
+              count: Number(count)
+            }))
+          : [];
+
+        setDepartmentStats(departmentsArray);
+      } else {
+        showToaster([data?.message || "Failed to fetch dashboard data"], "error");
+      }
+    } catch (error) {
+      console.error("Dashboard data fetch error:", error);
+      showToaster(["Error fetching dashboard data"], "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchDashboardData();
+}, []);
+
 
   const refreshData = async () => {
     // Same implementation as fetchDashboardData
