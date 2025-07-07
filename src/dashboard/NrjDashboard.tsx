@@ -130,11 +130,11 @@ const Dashboard = () => {
 
         setStats({
           unassigned: result.initiated || 0,
-          revertedToHelpDesk: 0, // Not in API
+          revertedToHelpDesk: result.reverted || 0, // Not in API
           withOfficers: result.assigned_officer_summary
             ? Object.values(result.assigned_officer_summary).reduce((a: number, b: any) => a + Number(b), 0)
             : 0,
-          revertedToDivision: 0, // Not in API
+          revertedToDivision: result.revertedtodvsn || 0, // Not in API
           underReview: result["under review"] || 0,
           closed: result.closed || 0
         });
