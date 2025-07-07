@@ -19,27 +19,46 @@ const LodgeComplaint = () => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const [states, setStates] = useState<string[]>([]);
 
-  useEffect(() => {
+useEffect(() => {
   const fetchStates = async () => {
     try {
-      const res = await fetch("https://example.com/api/states"); // replace with real API
-      const data = await res.json();
-      
-      if (Array.isArray(data) && data.length) {
-        // Replace static with dynamic states if available
-        setStateList(data.map((item: any) => ({
-          code: item.code || item.stateCode || item.id,
-          name: item.name || item.stateName
-        })));
+      const payload = {
+        cmpid: "test_4050c4498c03422e844304ec2bf86cc4",
+        usrnm: "test_CPCBHO"
+      };
+
+      const response = await fetch("https://biowaste.in/sttrgd", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const result = await response.json();
+
+      if (Array.isArray(result?.data)) {
+        // Deduplicate the state list
+      const stateList = Array.from(
+  new Set(result.data.map((item: any) => item.drpdwn).filter(Boolean))
+) as string[];
+
+setStates(stateList);
+      } else {
+        console.warn("Invalid response structure, using fallback.");
       }
     } catch (error) {
-      console.warn("Failed to fetch states, using static list.");
+      console.error("Failed to fetch state list, using fallback:", error);
     }
   };
 
   fetchStates();
 }, []);
+
+
+
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -51,11 +70,11 @@ const LodgeComplaint = () => {
 
  
 
-  const [stateList, setStateList] = useState([
-  { code: "MP", name: "Madhya Pradesh" },
-  { code: "UP", name: "Uttar Pradesh" },
-  { code: "MH", name: "Maharashtra" }
-]);
+//   const [stateList, setStateList] = useState([
+//   { code: "MP", name: "Madhya Pradesh" },
+//   { code: "UP", name: "Uttar Pradesh" },
+//   { code: "MH", name: "Maharashtra" }
+// ]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -215,7 +234,7 @@ const submitToAPI = async () => {
               <label className="block text-sm font-medium text-white mb-2">
                State
               </label>
-           <select
+           {/* <select
               name="stt"
               value={formData.stt}
               onChange={handleChange}
@@ -224,8 +243,25 @@ const submitToAPI = async () => {
               <option value="MP">Madhya Pradesh</option>
               <option value="UP">Uttar Pradesh</option>
               <option value="MH">Maharashtra</option>
-              {/* Add more states as needed */}
-            </select>
+          
+            </select> */}
+
+
+
+             <select
+                name="stt"
+                value={formData.stt}
+                onChange={handleChange}
+                className="mt-1 p-2 w-full border rounded-lg bg-white bg-opacity-10 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-300 text-sm"
+                required
+              >
+                <option value="">-- Select State --</option>
+                {states.map((state) => (
+                  <option className="text-black" key={state} value={state}>{state}</option>
+                ))}
+              </select>
+
+
            </div>
 
             {/* Issue Type Dropdown */}

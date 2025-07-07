@@ -171,34 +171,46 @@ const Registration = () => {
 
   // state field added
 
-  const fallbackStates = [
-    "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
-    "Delhi", "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand",
-    "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur",
-    "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab", "Rajasthan",
-    "Sikkim", "Tamil Nadu", "Telangana", "Tripura", "Uttar Pradesh",
-    "Uttarakhand", "West Bengal"
-  ];
+  
 
-  const [states, setStates] = useState<string[]>(fallbackStates);
 
-  useEffect(() => {
-    const fetchStates = async () => {
-      try {
-        const response = await fetch("https://your-api-url.com/statelist");
-        const data = await response.json();
-        if (Array.isArray(data.states)) {
-          setStates(data.states);
-        } else {
-          console.warn("Invalid state list from API, using fallback.");
-        }
-      } catch (error) {
-        console.error("Failed to fetch state list, using fallback:", error);
+  const [states, setStates] = useState<string[]>([]);
+
+useEffect(() => {
+  const fetchStates = async () => {
+    try {
+      const payload = {
+        cmpid: "test_4050c4498c03422e844304ec2bf86cc4",
+        usrnm: "test_CPCBHO"
+      };
+
+      const response = await fetch("https://biowaste.in/sttrgd", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const result = await response.json();
+
+      if (Array.isArray(result?.data)) {
+        // Deduplicate the state list
+      const stateList = Array.from(
+  new Set(result.data.map((item: any) => item.drpdwn).filter(Boolean))
+) as string[];
+
+setStates(stateList);
+      } else {
+        console.warn("Invalid response structure, using fallback.");
       }
-    };
-    fetchStates();
-  }, []);
+    } catch (error) {
+      console.error("Failed to fetch state list, using fallback:", error);
+    }
+  };
 
+  fetchStates();
+}, []);
   const fallbackRoles = ["CBWTF", "HCF", "SPCB", "RD", "CPCB"];
   const [roles, setRoles] = useState<string[]>(fallbackRoles);
 
