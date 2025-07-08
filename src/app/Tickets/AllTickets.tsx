@@ -362,12 +362,53 @@ const AllTickets: React.FC = () => {
     setShowFullTrail(false);
   };
 
-  const handleUpdateAssign = () => {
-    console.log('Update clicked for:', selectedTicket?.ticketId, 'Assigned to:', selectedTicket?.assignedTo);
-    showToaster(['Assignment updated successfully'], 'success');
-    setAssignModalOpen(false);
-    setSelectedTicket(null);
-  };
+  // const handleUpdateAssign = () => {
+  //   console.log('Update clicked for:', selectedTicket?.ticketId, 'Assigned to:', selectedTicket?.assignedTo);
+  //   showToaster(['Assignment updated successfully'], 'success');
+  //   setAssignModalOpen(false);
+  //   setSelectedTicket(null);
+  // };
+
+  const handleUpdateAssign = async () => {
+  // if (!selectedTicket) return;
+
+  const payload =
+
+  {
+  "ticket_id": "CBSTBMW1",
+  "assigned_to": "Atishay CPCB",
+  "assigned_by": "admin_user",
+  "comment": "Assigning to atishay for data verification",
+  "document_path": "sdfghjkl",
+  "what_fnct":"bmwticket_assign_ticket"
+}
+  
+  // {
+  //   ticket_id: selectedTicket.ticketId,
+  //   assigned_to: selectedTicket.assignedTo || 'Atishay CPCB', // fallback value if needed
+  //   assigned_by: 'admin_user', // adjust based on actual login/session
+  //   comment: `Assigning to ${selectedTicket.assignedTo} for data verification`,
+  //   document_path: 'sdfghjkl', // replace with actual document path if dynamic
+  //   what_fnct: 'bmwticket_assign_ticket',
+  // };
+
+  try {
+    const res = await genericPostAPI('bmw/myApp', payload);
+
+    if (res?.status === 'success') {
+      showToaster([res.message || 'Ticket assigned successfully'], 'success');
+      setAssignModalOpen(false);
+      setSelectedTicket(null);
+      refetch(); // Refresh grid data if needed
+    } else {
+      showToaster([res?.message || 'Failed to assign ticket'], 'error');
+    }
+  } catch (err: any) {
+    console.error('Assignment Error:', err);
+    showToaster([err?.message || 'Assignment failed due to server error'], 'error');
+  }
+};
+
 
   const handleViewFullTrail = async () => {
     setShowFullTrail(true);
