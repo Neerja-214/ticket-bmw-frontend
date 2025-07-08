@@ -41,12 +41,23 @@ const Dashboard = () => {
 
   const [userRole] = useState("Admin"); // In a real app, this would come from auth context
 
-  const handleLogout = () => {
-    // Clear session/local storage
-    sessionStorage.removeItem("isLoggedOut");
-    // Redirect to login
-    navigate("/login");
-  };
+const handleLogout = () => {
+  // Clear all session and local storage
+  sessionStorage.clear();
+  localStorage.clear();
+
+  // Optionally reset any global state (like Redux, Context, etc.)
+  // dispatch({ type: 'LOGOUT_USER' });
+
+  // Optionally show a toaster or notification
+  showToaster(['You have been logged out.'], 'success');
+
+  // Optionally call logout API (for server-side cleanup or logging)
+  // await genericPostAPI("logout", { userId });
+
+  // Redirect to login page
+  navigate("/login");
+};
 
 
   const [activeMenu, setActiveMenu] = useState("Dashboard");
