@@ -9,6 +9,7 @@ import { UseMomentDateNmb } from '../../Hooks/useMomentDtArry';
 import CPCB_Logo from '../../images/CPCB_Logo.jpg';
 import { Modal, Button, Box, Typography, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import ConfirmationNumberIcon from '@mui/icons-material/ConfirmationNumber';
+import { genericPostAPI } from 'src/services/apiService';
 
 // Define type for ticket data
 type TicketData = {
@@ -219,17 +220,58 @@ const AllTickets: React.FC = () => {
 
   // Mock data fetching function for grid
   const fetchTickets = async () => {
-    const lvl = getLvl() || 'CPCB';
-    const who = getWho();
-    const dt = UseMomentDateNmb(moment(Date.now()).format('DD-MMM-yyyy'));
-    const payload = {
-      lvl,
-      who,
-      date: dt,
-    };
-    return { data: dummyData };
+    // const lvl = getLvl() || 'CPCB';
+    // const who = getWho();
+    // const dt = UseMomentDateNmb(moment(Date.now()).format('DD-MMM-yyyy'));
+    // const payload = {
+    //   lvl,
+    //   who,
+    //   date: dt,
+    // };
+    // return { data: dummyData };
     // Uncomment for actual API
     // return nrjAxiosRequest('getTickets', payload);
+
+      const payload = {
+      rgd: "",
+      stt: "",
+      email: "",
+      status: "",
+      ticket_id: "CBSTBMW1",
+      what_fnct: "bmwticket_show_tickets"
+    };
+
+    try {
+      const data = await genericPostAPI("bmw/myApp", payload);
+      if (data?.status === "success") {
+        const result = data.result || [];
+        const formatted = result.map((item: any) => ({
+          ticketId: item.ticket_id || '',
+          issueType: item.issue_type || '',
+          generatedOn: moment(item.created_on?.$date).format("DD-MMM-YYYY") || '',
+          reviewedOn: moment(item.updated_on?.$date).format("DD-MMM-YYYY") || '',
+          reviewedBy: item?.assigned_to?.[1]?.assigned_to || '',
+          complainantName: item.email?.split("@")[0] || '',
+          complainantEmail: item.email || '',
+          complainantPhone: '', // Not available in response
+          closedDate: '', // Not provided
+          issue: item.description || '',
+          screenshots: [item.image || ''],
+          ticketStatus: item.status || '',
+          assignedTo: item.assigned_to?.[1]?.assigned_to || '',
+        }));
+        dispatch({ type: ACTIONS.NEWROWDATA, payload: formatted });
+        setTimeout(() => {
+          dispatch({ type: ACTIONS.TRIGGER_GRID, payload: 0 });
+        }, 500);
+      } else {
+        showToaster([data?.message || "Failed to load tickets"], "error");
+      }
+    } catch (err: any) {
+      console.error("API Error:", err);
+      showToaster([err?.message || "Failed to fetch ticket data"], "error");
+    }
+  
   };
 
   // Mock API for fetching ticket details
