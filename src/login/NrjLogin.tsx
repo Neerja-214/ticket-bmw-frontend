@@ -13,6 +13,7 @@ import { useToaster } from "../components/reusable/ToasterContext";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { nrjAxiosRequestBio, nrjAxiosRequestLinux } from "../Hooks/useNrjAxios";
 import CPCB_Logo from '../images/CPCB_Logo.jpg'
+import { genericPostAPI } from "src/services/apiService";
 
 // Define action types
 const ACTIONS = {
@@ -98,91 +99,83 @@ const NrjLogin = () => {
     setIsPasswordVisible(!isPasswordVisible);
   };
 
-  const ChckLgn = () => {
-    dispatch({ type: ACTIONS.DISABLEA, payload: 0 });
-    if (email && email.length > 0) {
-      if (password && password.length > 0 && captcha) {
-        let payload: any = postLinux(
-          email + "|" + password + "|" + (selectedType === "Admin" ? "1" : "2") + "|" + captcha + "|" + uuid,
-          "login",
-          true
-        );
-        const result = utilities(0, "check_Login", payload);
-        if (result) {
-          // Log the result to debug
-          console.log("Utilities result for login:", result);
-          (result as unknown as Promise<any>).then((res: any) => {
-            let isloggedoutJson = {
-              by: generateRandomAlphanumeric(10),
-              usrnm: email,
-              ky: generateRandomAlphanumeric(10),
-            };
-            sessionStorage.setItem("isLoggedOut", btoa(JSON.stringify(isloggedoutJson)));
-            dispatch({ type: ACTIONS.DISABLEA, payload: 1 });
-            let ary: any[] = [res.data];
-            if (ary && ary[0]["id"] && ary[0]["id"] != "0") {
-              if (Number(ary[0]["id"]) > 100) {
-                ary[0]["_cmp"] ? setCmpId(ary[0]["_cmp"]) : setCmpId(ary[0]["cmpid"]);
-                ary[0]["_usr"] ? setUsrId(ary[0]["_usr"]) : setUsrId(ary[0]["usrid"]);
-                sessionStorage.setItem("mainid", ary[0]["id"]);
-                sessionStorage.setItem("brd", ary[0]["cpcbof"]);
-                if (!ary && Number(ary[0]["pswage"]) >= 150) {
-                  navigate("/changePwd?login=false");
-                } else {
-                  setTimeout(() => {
-                    showToaster(["Successfully logged in"], "success");
-                  }, 0);
-                  navigate("/dashboardvb");
-                }
-              } else {
-                sessionStorage.removeItem("isLoggedOut");
-                showToaster(["Invalid Credentials / Error Login In"], "error");
-                dispatch({ type: ACTIONS.DISABLEA, payload: 1 });
-                setTimeout(() => {
-                  dispatch({ type: ACTIONS.DISABLEA, payload: 1 });
-                }, 1900);
-              }
-            } else {
-              setTimeout(() => {
-                dispatch({ type: ACTIONS.DISABLEA, payload: 1 });
-              }, 1900);
-              reloadCaptcha();
-              sessionStorage.removeItem("isLoggedOut");
-              setCaptcha("");
-              dispatch({ type: ACTIONS.DISABLEA, payload: 1 });
-              showToaster([ary[0]["cpcbof"]], "error");
-            }
-          }).catch((error) => {
-            console.error("Login error:", error);
-            sessionStorage.removeItem("isLoggedOut");
-            reloadCaptcha();
-            setCaptcha("");
-            dispatch({ type: ACTIONS.DISABLEA, payload: 1 });
-          });
-        } else {
-          console.error("Utilities returned undefined for login");
-          showToaster(["Failed to initialize login request"], "error");
-          dispatch({ type: ACTIONS.DISABLEA, payload: 1 });
-        }
-      } else {
-        dispatch({ type: ACTIONS.DISABLEA, payload: 1 });
-        sessionStorage.removeItem("isLoggedOut");
-        if (!password && !captcha) {
-          showToaster(["Please enter password and captcha"], "error");
-        } else if (!password) {
-          showToaster(["Please enter password value"], "error");
-        } else if (!captcha) {
-          showToaster(["Please enter captcha value"], "error");
-        }
-      }
-    } else {
-      setEmail("");
-      setPassword("");
-      sessionStorage.removeItem("isLoggedOut");
-      dispatch({ type: ACTIONS.DISABLEA, payload: 1 });
-      showToaster(["Please enter email"], "error");
+  
+
+const ChckLgn = async () => {
+  dispatch({ type: ACTIONS.DISABLEA, payload: 0 });
+
+  if (!email) {
+    setEmail("");
+    setPassword("");
+    sessionStorage.removeItem("isLoggedOut");
+    dispatch({ type: ACTIONS.DISABLEA, payload: 1 });
+    showToaster(["Please enter email"], "error");
+    return;
+  }
+
+  if (!password || !captcha) {
+    dispatch({ type: ACTIONS.DISABLEA, payload: 1 });
+    sessionStorage.removeItem("isLoggedOut");
+
+    if (!password && !captcha) {
+      showToaster(["Please enter password and captcha"], "error");
+    } else if (!password) {
+      showToaster(["Please enter password value"], "error");
+    } else if (!captcha) {
+      showToaster(["Please enter captcha value"], "error");
     }
+    return;
+  }
+
+  const payload = {
+    email: email,
+    password: password,
+    what_fnct: "bmwticket_ticket_tracker_login",
   };
+
+  try {
+    const data = await genericPostAPI("bmw/myApp", payload);
+
+    if (data?.status === "success" && data.result) {
+      const user = data.result;
+
+      // Store session info
+      const isloggedoutJson = {
+        by: generateRandomAlphanumeric(10),
+        usrnm: email,
+        ky: generateRandomAlphanumeric(10),
+      };
+      sessionStorage.setItem("isLoggedOut", btoa(JSON.stringify(isloggedoutJson)));
+
+      sessionStorage.setItem("mainid", user.userid || "0");
+      sessionStorage.setItem("brd", user.role || "");
+      setCmpId(user.company_name || "");
+      setUsrId(user.email || "");
+
+      showToaster([data.message || "Login successful"], "success");
+
+      setTimeout(() => {
+        navigate("/dashboardvb");
+      }, 500);
+    } else {
+      showToaster([data?.message || "Invalid Credentials / Login Error"], "error");
+      sessionStorage.removeItem("isLoggedOut");
+    }
+  } catch (err: any) {
+    console.error("Login Error:", err);
+    showToaster(
+      [err?.message || "Something went wrong during login."],
+      "error"
+    );
+    sessionStorage.removeItem("isLoggedOut");
+  } finally {
+    dispatch({ type: ACTIONS.DISABLEA, payload: 1 });
+    reloadCaptcha();
+    setCaptcha("");
+  }
+};
+
+
 
   return (
     <div className="flex flex-col min-h-screen bg-blue-900 relative overflow-hidden">
